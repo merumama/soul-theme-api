@@ -32,7 +32,7 @@ DATA_DIR = (Path(__file__).resolve().parent.parent / "data").resolve()
 # -------------------------
 # 日付正規化（多形式対応）
 # -------------------------
-FULL2HALF = str.maketrans("０１２３４５６７８９／－．年月日", "0123456789/-.   ")
+FULL2HALF = str.maketrans("０１２３４５６７８９／－．", "0123456789/-.")
 
 def to_yyyy_mm_dd(raw: str) -> str:
     """
