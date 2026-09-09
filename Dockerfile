@@ -9,6 +9,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY app ./app
 COPY data ./data
+COPY static ./static
 
 # Uvicorn on $PORT (HF Spaces uses PORT env)
 EXPOSE 7860
