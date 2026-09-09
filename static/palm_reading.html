@@ -233,6 +233,33 @@
     font-size:.8rem;
     color:var(--ink-soft);
   }
+  .finger-signs{
+    margin-top:10px;
+    padding-top:8px;
+    border-top:1px dashed var(--line);
+  }
+  .finger-signs .signs-label{
+    display:block;
+    font-size:.72rem;
+    text-transform:uppercase;
+    letter-spacing:.04em;
+    color:var(--ink-soft);
+    margin-bottom:6px;
+  }
+  .finger-signs .sign-item{
+    display:flex;
+    align-items:flex-start;
+    gap:6px;
+    font-size:.78rem;
+    margin-bottom:6px;
+    cursor:pointer;
+    color:var(--ink);
+  }
+  .finger-signs .sign-item input{
+    margin-top:3px;
+    flex:none;
+    cursor:pointer;
+  }
   .hint{
     font-size:.78rem;
     color:var(--ink-soft);
@@ -432,6 +459,17 @@
           </div>
         </fieldset>
         <div id="nailWidthResult" class="subblock"></div>
+        <div class="divider"></div>
+        <fieldset data-key="nailCurve">
+          <legend>爪の半月・反りの形（補足／爪の形とは別軸で、標準の爪にも当てはまることがあります）</legend>
+          <div class="options">
+            <div class="opt"><input type="radio" name="nailCurve" id="nc-curved" value="curved"><label for="nc-curved">湾曲形（半月が湾曲）</label></div>
+            <div class="opt"><input type="radio" name="nailCurve" id="nc-straight" value="straight"><label for="nc-straight">直線形（半月が直線的）</label></div>
+            <div class="opt"><input type="radio" name="nailCurve" id="nc-reversed" value="reversed"><label for="nc-reversed">反り爪（強く反り返っている）</label></div>
+            <div class="opt"><input type="radio" name="nailCurve" id="nc-none" value=""><label for="nc-none">特になし</label></div>
+          </div>
+        </fieldset>
+        <div id="nailCurveResult" class="subblock"></div>
       </div>
 
       <!-- 5: 指の柔軟性 -->
@@ -447,7 +485,7 @@
       <!-- 6: 指ごとの意味 -->
       <div class="card">
         <h2><span class="num">6</span>指ごとの意味（親指〜小指）</h2>
-        <p class="lead">よしみの手相観では、西洋手相術をベースに各指を惑星のエネルギーとして読み解きます。特徴的な指があればメモを追加してください。</p>
+        <p class="lead">よしみの手相観では、西洋手相術をベースに各指を惑星のエネルギーとして読み解きます。爪の線・ねじれ・ほくろ・乾燥・関節の張りなど「魂の癖」に当たるサインは、各指カード内でチェックしてください。</p>
         <div class="finger-grid" id="fingerGrid"></div>
       </div>
 
@@ -573,17 +611,17 @@ const NAIL_SHAPES = [
    text:`神経質で気にする性格。神経過敏で人とは違う細かい部分に目が行き、斬新なアイデアを持つことが多い。`},
   {id:"nail-rtriangle", label:"逆三角形",
    text:`押しが強く積極的に行動するタイプ。`},
-  {id:"nail-curved", label:"湾曲形（半月が湾曲）",
-   text:`穏やかで他者とのバランスを取ることが得意。執念深さがなく物事を穏やかに進められる。`},
-  {id:"nail-straight", label:"直線形（半月が直線的）",
-   text:`忍耐強く、執念や執着を持ちやすい傾向。その反面、孤独になりやすい面もある。`},
-  {id:"nail-reversed", label:"反り爪（強く反り返っている）",
-   text:`直線型の性質がさらに強まった状態。反発しやすい・受け入れがたい・意見をはじきやすい傾向と、孤独になりやすい面が強まる。一方でうまく活かせば強いリーダーシップにつながる。親指以外の指（円錐型・尖頭型など）で強く反っている場合は、次元の違うものをキャッチする独特の感覚・霊的な感度のサインとしても読まれる。`},
 ];
 
 const NAIL_WIDTH = {
   narrow: `幅が狭い爪：筋力的な強さよりも神経質さ・苦労性の傾向。意地っ張りな面もあり、繊細で霊的な性格を持つことが多い。幅が狭いほどデリケートさが増す。`,
   wide: `幅が広い爪：筋力的な強さを持ち、心が広く明朗な性格。基本的に正直で誠実、大胆で肝が座っており面倒見が良い。自己主張が強くプライドが高い面も。`
+};
+
+const NAIL_CURVE = {
+  curved: `湾曲形（半月が湾曲）：穏やかで他者とのバランスを取ることが得意。執念深さがなく物事を穏やかに進められる。`,
+  straight: `直線形（半月が直線的）：忍耐強く、執念や執着を持ちやすい傾向。その反面、孤独になりやすい面もある。`,
+  reversed: `反り爪（強く反り返っている）：直線型の性質がさらに強まった状態。反発しやすい・受け入れがたい・意見をはじきやすい傾向と、孤独になりやすい面が強まる。一方でうまく活かせば強いリーダーシップにつながる。親指以外の指で強く反っている場合は、次元の違うものをキャッチする独特の感覚・霊的な感度のサインとしても読まれる。`
 };
 
 const WRIST_THICKNESS = [
@@ -619,32 +657,49 @@ const FLEXIBILITY = [
 
 const FINGERS = [
   {id:"thumb", name:"親指", planet:"惑星に属さない「自分」＝司令塔",
-   text:`親指だけは特定の惑星に属さず、「アイデンティティ（自分らしさ・信念）」そのものを表す司令塔の指とされます。木星・土星・金星・水星という他の4本（惑星のエネルギーの受信庫）が、「本当の自分」と一致した使われ方をしているかを横からチェックする役割です。
-・太陽＝男性性のエネルギーとも結び付けられ、低い位置から出ている（下から支えるように出ている）親指は、下から支えるパワー・大きな包容力を持つサイン。
-・テーマになりやすいのは、信念を伝えようとしつつ、周囲との調和を優先してそれを後回しにする癖を手放すこと。「守る力」は誰かの希望を助けるためではなく、自分自身の希望を成し遂げることに使うのが本来の姿。
-・親指の爪に入った強い縦のライン（乾燥じわとは別のはっきりした線）は、父親・祖父など身内の男性性からの圧のプログラムを示すことがあり、中指の状態とセットで読まれます。
-・人と出会い、ぶつかる体験そのものが「親指＝アイデンティティ」を鍛える実践トレーニングになります。`},
+   text:`親指だけは特定の惑星に属さず、「アイデンティティ（自分らしさ・信念）」そのものを表す司令塔の指とされます。木星・土星・金星・水星という他の4本（惑星のエネルギーの受信庫）が、「本当の自分」と一致した使われ方をしているかを横からチェックする役割です。太陽＝男性性のエネルギーとも結び付けられ、低い位置から出ている（下から支えるように出ている）親指は、下から支えるパワー・大きな包容力を持つサインとされます。テーマになりやすいのは、信念を伝えようとしつつ、周囲との調和を優先してそれを後回しにする癖を手放すこと。「守る力」は誰かの希望を助けるためではなく、自分自身の希望を成し遂げることに使うのが本来の姿です。人と出会い、ぶつかる体験そのものが「親指＝アイデンティティ」を鍛える実践トレーニングになります。`,
+   signs:[
+     {id:"nailline", label:"爪に強い縦のラインが入っている（乾燥じわとは別のはっきりした線）",
+      text:`父親・祖父など身内の男性性からの圧のプログラムを示すことがあり、中指の状態とセットで読まれます。`},
+   ]},
   {id:"index", name:"人差し指", planet:"木星（Jupiter）",
-   text:`木星＝自分の行く先を指し示すエネルギー。自分にとってどんな理想があり、どの方向に進みたいかを示す指で、女性性・母親との関係性が映し出されやすい指でもあります。
-・第二関節から爪に向かって中指側にねじれている場合、幼少期に外圧（特に母親）によって、本来まっすぐ進みたかった方向を「ねじらされた」ことが定着したサインとされます。ねじれではなく指全体が中指側に「引っ張られた」ようにずれている場合も、同様に"合わせなければならないことをやってきた"履歴を示しますが、力学的な出方が異なります。
-・爪に入った黒い縦線は「母からの圧」のサイン。母の評価や視線を無意識に基準にして物事を選ぶ癖が固着していることを示し、気づきとともに薄くなっていきます。
-・第二関節の膨らみは、この指では「計画・スケジュールを整える」ことに頭を使う傾向として細分化されます。
-・テーマの問いかけ：「これ、本当に私がやりたいことかな？」`},
+   text:`木星＝自分の行く先を指し示すエネルギー。自分にとってどんな理想があり、どの方向に進みたいかを示す指で、女性性・母親との関係性が映し出されやすい指でもあります。第二関節の膨らみは、この指では「計画・スケジュールを整える」ことに頭を使う傾向として細分化されます。テーマの問いかけ：「これ、本当に私がやりたいことかな？」`,
+   signs:[
+     {id:"twist", label:"第二関節から爪にかけて中指側にねじれている",
+      text:`幼少期に外圧（特に母親）によって、本来まっすぐ進みたかった方向を「ねじらされた」ことが定着したサインとされます。気づくとともにほどけていくことが多いサインです。`},
+     {id:"shift", label:"指全体が中指側に「ずれて」いる（ねじれとは違い角度がずれている）",
+      text:`ねじれと同様に"合わせなければならないことをやってきた"履歴を示しますが、力学的な出方が異なります。`},
+     {id:"blackline", label:"爪に黒い縦線が入っている",
+      text:`母からの圧のサイン。母の評価や視線を無意識に基準にして物事を選ぶ癖が固着していることを示し、気づくと薄くなっていきます。`},
+   ]},
   {id:"middle", name:"中指", planet:"土星（Saturn）",
-   text:`土星＝忍耐・継続・努力・社会性・責任感・正義感のエネルギー。まっすぐ整った中指は、社会的な対応能力や現実対応力（やると決めたらやり切る力）の高さを表し、仕事・経済活動の領域にも出やすい指です。魂の取り扱いの「中心軸」になりやすく、他の指（他の惑星のエネルギー）がここに引き寄せられることもあります。
-・男性性・父親的存在を象徴する指でもあり、第一関節にほくろがある場合は「社会とどう向き合うか」がテーマで、父親的なエネルギーを前にすると社会的な場面で弱気になる癖として表れることがあります（親指のライン＝父的存在からの圧、とセットで読まれます）。
-・薬指側に曲がっている場合、現実的に形にはしていくものの、最後に踏み出す段階で意識がふっと折れてしまう傾向のサインとされます。
-・第二関節の膨らみは、この指では「現実的な整理整頓・人間関係やオペレーションの構築」に頭を使う傾向として細分化されます。`},
+   text:`土星＝忍耐・継続・努力・社会性・責任感・正義感のエネルギー。まっすぐ整った中指は、社会的な対応能力や現実対応力（やると決めたらやり切る力）の高さを表し、仕事・経済活動の領域にも出やすい指です。魂の取り扱いの「中心軸」になりやすく、他の指（他の惑星のエネルギー）がここに引き寄せられることもあります。男性性・父親的存在を象徴する指でもあります。第二関節の膨らみは、この指では「現実的な整理整頓・人間関係やオペレーションの構築」に頭を使う傾向として細分化されます。`,
+   signs:[
+     {id:"mole", label:"第一関節にほくろがある",
+      text:`「社会とどう向き合うか」がテーマ。父親的なエネルギーを前にすると社会的な場面で弱気になる癖として表れることがあります（親指の縦ラインとセットで読まれます）。`},
+     {id:"lean-ring", label:"薬指側に曲がっている",
+      text:`現実的に形にはしていくものの、最後に踏み出す段階で意識がふっと折れてしまう傾向のサインとされます。`},
+   ]},
   {id:"ring", name:"薬指", planet:"金星（Venus）",
-   text:`金星＝人生の主役として輝くエネルギー。自分の魅力・自己表現・自分らしい輝き方への自信を象徴し、お金にならない"好きなこと"（音楽・芸術など）に特に表れやすい指です。副交感神経的に独立した指ともされ、他の指と質感や表情が違って見えることがあります。
-・ほくろがある場合は、自己表現や輝くことを抑えている癖が強いサインとされます。
-・乾燥や意識の向きにくさ（他の指より爪の輪郭がぼやける、甘皮が荒れているなど）が出やすい指で、「自分なりの輝き方は何？」という問いかけが有効です。
-・指が傾いていたり普段と違う動きをする場合は「何かを伝えようとしている」サインとして着目します。`},
+   text:`金星＝人生の主役として輝くエネルギー。自分の魅力・自己表現・自分らしい輝き方への自信を象徴し、お金にならない"好きなこと"（音楽・芸術など）に特に表れやすい指です。副交感神経的に独立した指ともされ、他の指と質感や表情が違って見えることがあります。`,
+   signs:[
+     {id:"mole", label:"ほくろがある",
+      text:`自己表現や輝くことを抑えている癖が強いサインとされます。`},
+     {id:"dry", label:"乾燥している・他の指より意識が向きにくい（爪の輪郭がぼやける、甘皮が荒れているなど）",
+      text:`自分の魅力への自信が向けられにくくなっているサイン。「自分なりの輝き方は何？」という問いかけが有効です。`},
+     {id:"lean", label:"指が傾いている・普段と違う動きをする",
+      text:`「何かを伝えようとしている」サインとして着目します。`},
+   ]},
   {id:"pinky", name:"小指", planet:"水星（Mercury）",
-   text:`水星＝コミュニケーションのエネルギー。人に気持ちを伝えることと、人に委ねる・甘える・頼ることの両方向を象徴します。
-・第一関節が曲がっている場合「委ねる・甘える」がテーマになりやすく、幼少期に「一人で頑張りなさい」と刷り込まれた記憶が背景にあることも。「委ねるためには他者が必要」であり、一人で抱え込むことを手放すことがテーマです。
-・第二関節の張り・膨らみは、女性性（受容・育む力）の抱え込みや、第二チャクラ（子宮・生殖領域）周辺のエネルギーの滞り、時に代々（祖母・母）続くパターンと関連づけて読まれることがあります。
-・かぶれ・あかぎれがある場合は、コミュニケーションを抑えているエネルギーが溢れて皮膚に出たサイン（ほくろより緊急性が高く、"今まさに"起きていることを示します）。`},
+   text:`水星＝コミュニケーションのエネルギー。人に気持ちを伝えることと、人に委ねる・甘える・頼ることの両方向を象徴します。「委ねるためには他者が必要」であり、一人で抱え込むことを手放すことがテーマです。`,
+   signs:[
+     {id:"joint1", label:"第一関節が曲がっている",
+      text:`「委ねる・甘える」がテーマになりやすく、幼少期に「一人で頑張りなさい」と刷り込まれた記憶が背景にあることも。`},
+     {id:"joint2", label:"第二関節が張っている・膨らんでいる",
+      text:`女性性（受容・育む力）の抱え込みや、第二チャクラ（子宮・生殖領域）周辺のエネルギーの滞り、時に代々（祖母・母）続くパターンと関連づけて読まれることがあります。`},
+     {id:"rash", label:"かぶれ・あかぎれがある",
+      text:`コミュニケーションを抑えているエネルギーが溢れて皮膚に出たサイン（ほくろより緊急性が高く、"今まさに"起きていることを示します）。`},
+   ]},
 ];
 
 const HABIT_SIGNS = [
@@ -670,12 +725,13 @@ const state = {
   handSize:"", fingerLength:"",
   typeFeatures:new Set(),
   treeSubtype:"", crystalSubtype:"",
-  fingertip:"", nailShape:"", nailWidth:"",
+  fingertip:"", nailShape:"", nailWidth:"", nailCurve:"",
   flexibility:"",
   wrist:"",
   otherSigns:new Set(),
   habitSigns:new Set(),
-  fingerNotes:{}
+  fingerNotes:{},
+  fingerSigns:{}
 };
 
 function el(tag, cls, html){
@@ -718,10 +774,18 @@ buildOptionGroup(document.getElementById("otherSignOptions"), OTHER_SIGNS, "othe
 const fingerGrid = document.getElementById("fingerGrid");
 FINGERS.forEach(f=>{
   const card = el("div","finger-card");
+  const signsHtml = (f.signs||[]).map(s=>{
+    const inputId = `fingerSign-${f.id}-${s.id}`;
+    return `<label class="sign-item" for="${inputId}"><input type="checkbox" name="fingerSign-${f.id}" id="${inputId}" value="${s.id}"><span>${s.label}</span></label>`;
+  }).join("");
   card.innerHTML = `<h3>${f.name}</h3><span class="planet">${f.planet}</span>
     <div class="meta-desc">${f.text}</div>
-    <textarea placeholder="この指について気づいたことをメモ（長さ・傾き・関節・爪の状態など）" data-finger="${f.id}"></textarea>`;
+    ${f.signs && f.signs.length ? `<div class="finger-signs"><span class="signs-label">魂の癖のサイン（気になれば選択）</span>${signsHtml}</div>` : ""}
+    <textarea placeholder="この指について気づいたことをメモ（任意）" data-finger="${f.id}"></textarea>`;
   fingerGrid.appendChild(card);
+});
+fingerGrid.querySelectorAll('input[type="checkbox"]').forEach(cb=>{
+  cb.addEventListener("change", onAnyChange);
 });
 fingerGrid.querySelectorAll("textarea").forEach(t=>{
   t.addEventListener("input", ()=>{
@@ -731,7 +795,7 @@ fingerGrid.querySelectorAll("textarea").forEach(t=>{
 });
 
 document.querySelectorAll('input[name="handSize"], input[name="fingerLength"]').forEach(i=>i.addEventListener("change", onAnyChange));
-document.querySelectorAll('input[name="nailWidth"]').forEach(i=>i.addEventListener("change", onAnyChange));
+document.querySelectorAll('input[name="nailWidth"], input[name="nailCurve"]').forEach(i=>i.addEventListener("change", onAnyChange));
 document.getElementById("clientName").addEventListener("input", renderReport);
 document.getElementById("sessionDate").addEventListener("input", renderReport);
 document.getElementById("handSide").addEventListener("change", renderReport);
@@ -751,10 +815,15 @@ function syncState(){
   state.fingertip = (document.querySelector('input[name="fingertip"]:checked')||{}).value || "";
   state.nailShape = (document.querySelector('input[name="nailShape"]:checked')||{}).value || "";
   state.nailWidth = (document.querySelector('input[name="nailWidth"]:checked')||{}).value || "";
+  state.nailCurve = (document.querySelector('input[name="nailCurve"]:checked')||{}).value || "";
   state.flexibility = (document.querySelector('input[name="flexibility"]:checked')||{}).value || "";
   state.wrist = (document.querySelector('input[name="wrist"]:checked')||{}).value || "";
   state.otherSigns = new Set([...document.querySelectorAll('input[name="otherSign"]:checked')].map(i=>i.value));
   state.habitSigns = new Set([...document.querySelectorAll('input[name="habitSign"]:checked')].map(i=>i.value));
+  FINGERS.forEach(f=>{
+    const checked = [...document.querySelectorAll(`input[name="fingerSign-${f.id}"]:checked`)].map(i=>i.value);
+    state.fingerSigns[f.id] = new Set(checked);
+  });
 }
 
 function computeBaseType(){
@@ -824,6 +893,14 @@ function renderSubblocks(){
     nailWidthResult.classList.remove("show");
   }
 
+  const nailCurveResult = document.getElementById("nailCurveResult");
+  if(state.nailCurve && NAIL_CURVE[state.nailCurve]){
+    nailCurveResult.classList.add("show");
+    nailCurveResult.innerHTML = `<p>${NAIL_CURVE[state.nailCurve]}</p>`;
+  } else {
+    nailCurveResult.classList.remove("show");
+  }
+
   const habitResult = document.getElementById("habitResult");
   if(state.habitSigns.size){
     habitResult.classList.add("show");
@@ -889,10 +966,11 @@ function renderReport(){
   }
 
   const ns = NAIL_SHAPES.find(t=>t.id===state.nailShape);
-  if(ns || state.nailWidth){
+  if(ns || state.nailWidth || state.nailCurve){
     out.push("【4. 爪の形】");
     if(ns){ out.push(`${ns.label}：${ns.text}`); }
     if(state.nailWidth && NAIL_WIDTH[state.nailWidth]) out.push(NAIL_WIDTH[state.nailWidth]);
+    if(state.nailCurve && NAIL_CURVE[state.nailCurve]) out.push(NAIL_CURVE[state.nailCurve]);
     out.push("");
   }
 
@@ -903,11 +981,14 @@ function renderReport(){
     out.push("");
   }
 
-  const fingerNoteEntries = FINGERS.filter(f=> (state.fingerNotes[f.id] && state.fingerNotes[f.id].trim()));
   out.push("【6. 指ごとの意味（親指〜小指）】");
   FINGERS.forEach(f=>{
     out.push(`◆ ${f.name}（${f.planet}）`);
     out.push(f.text);
+    const checkedSigns = (f.signs||[]).filter(s => (state.fingerSigns[f.id]||new Set()).has(s.id));
+    checkedSigns.forEach(s=>{
+      out.push(`　▷ ${s.label}：${s.text}`);
+    });
     const note = state.fingerNotes[f.id];
     if(note && note.trim()) out.push(`　メモ：${note.trim()}`);
     out.push("");
