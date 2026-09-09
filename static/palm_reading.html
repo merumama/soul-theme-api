@@ -336,6 +336,38 @@
     background:var(--line);
     margin:16px 0;
   }
+  .why{
+    margin:0 0 14px;
+    border:1px solid var(--line);
+    border-radius:10px;
+    background:var(--surface-soft);
+    overflow:hidden;
+  }
+  .why summary{
+    cursor:pointer;
+    list-style:none;
+    padding:8px 14px;
+    font-size:.82rem;
+    color:var(--accent);
+    font-weight:600;
+    display:flex;
+    align-items:center;
+    gap:6px;
+  }
+  .why summary::-webkit-details-marker{display:none;}
+  .why summary::before{
+    content:"▸";
+    display:inline-block;
+    transition:transform .15s ease;
+    font-size:.7rem;
+  }
+  .why[open] summary::before{transform:rotate(90deg);}
+  .why .why-body{
+    padding:0 14px 12px;
+    font-size:.82rem;
+    color:var(--ink-soft);
+    line-height:1.75;
+  }
   .tag-mixed{border-color:var(--accent) !important; background:var(--surface-soft) !important;}
   @media print{
     .card:not(#resultCard){display:none;}
@@ -383,6 +415,10 @@
       <div class="card">
         <h2><span class="num">1</span>手の大きさ・指の長さ（魂のテンポ）</h2>
         <p class="lead">大きさ・指の長さは優劣ではなく「魂が得意とするテンポ」を示します。</p>
+        <details class="why">
+          <summary>なぜこれを見るのか</summary>
+          <div class="why-body">魂は「感覚→感情→思考→肉体（行動）」という順番でエネルギーを伝達していきます。手の大きさ・指の長さは、この伝達にどれくらい時間をかけるか＝魂のテンポを測るものさしです。大きい手・長い指はこの伝達にじっくり時間をかけるタイプ（丁寧・内省的）、小さい手・短い指は伝達が速いタイプ（直感的・即行動）として見ます。特に指の長さは「思考のスピード」を示す指標として使われ、長い指＝内向的（自分の内側の興味に向かう）で細部にフォーカス、短い指＝外向的（外の世界に好奇心が向く）で全体像にフォーカスする、という違いとして読みます。</div>
+        </details>
         <fieldset data-key="handSize">
           <legend>手の大きさ</legend>
           <div class="options">
@@ -404,6 +440,10 @@
       <div class="card">
         <h2><span class="num">2</span>樹木型／クリスタル型 診断</h2>
         <p class="lead">当てはまる特徴を選んでください（複数選択可）。優勢な方が「基本タイプ」の目安になります。</p>
+        <details class="why">
+          <summary>なぜこれを見るのか</summary>
+          <div class="why-body">樹木型・クリスタル型は、「感覚・感情・思考・肉体」という4つのエネルギーのうちどれが優位かを象徴しています（樹木＝思考優位、クリスタル＝感覚・感情・肉体のいずれかが優位）。この2つが正反対の見た目になる理由は、それぞれのエネルギーの性質にあります。思考はカロリー消費が非常に激しく、エネルギーは一方向にしか働かない特性があるため、思考優位（樹木型）だと肉体エネルギー（食欲）に向かいにくく、自然と痩せて関節・骨・血管が目立つようになります。一方、感覚・感情・肉体のエネルギー（クリスタル型）は「理由がなく、説明のつかないまま湧き上がる」性質を持ち、抑えることなくそのまま外に表れるため、骨張らず柔らかく、キメが細かく透明感のある手になります。樹木は「割らないと年輪が見えない」ように内に刻み込むタイプ、クリスタルは「透明で中まで見える」ように感じたことをそのまま出すタイプ、という対比で語られています。</div>
+        </details>
         <fieldset data-key="typeFeatures">
           <legend>手の特徴チェック</legend>
           <div class="options" id="typeFeatureOptions"></div>
@@ -433,6 +473,10 @@
       <div class="card">
         <h2><span class="num">3</span>指先の形（エネルギーの受け取り方）</h2>
         <p class="lead">爪の上部の幅が広いほど現実的・行動的、狭いほど感受性・理想性が高まります。最も特徴的な指を基準に選んでください。</p>
+        <details class="why">
+          <summary>なぜこれを見るのか</summary>
+          <div class="why-body">指先は、魂がこの世界と接触する「出入り口」とされています。爪の上部の幅は、外からのエネルギーをどう受け止めるかに比例すると考え、幅が広いほど現実的・行動的、狭いほど感受性・理想性が高まる、という読み方をします。</div>
+        </details>
         <fieldset data-key="fingertip">
           <legend>指先の形</legend>
           <div class="options" id="fingertipOptions"></div>
@@ -444,6 +488,10 @@
       <div class="card">
         <h2><span class="num">4</span>爪の形（魂の感受性）</h2>
         <p class="lead">爪は魂が生命エネルギーを受け取るバリア＝感受性の器です。</p>
+        <details class="why">
+          <summary>なぜこれを見るのか</summary>
+          <div class="why-body">爪は魂が生命エネルギーを受け取るバリア＝感受性の器であると同時に、体の中で内部（血液）の状態が最も外から見える"窓"でもあります（病院で爪から健康状態を確認することがあるのもそのためです）。長さ・幅・厚み・湾曲・色・線など、爪に表れるあらゆる情報が、魂がこの世界でどう受け取り、表現し、行動するのかのヒントになるとされています。</div>
+        </details>
         <fieldset data-key="nailShape">
           <legend>爪の形（全体的に特徴的な形）</legend>
           <div class="options" id="nailShapeOptions"></div>
