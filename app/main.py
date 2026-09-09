@@ -1,5 +1,6 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
 from pydantic import BaseModel, field_validator
 from typing import Dict, Any, List
 from datetime import datetime
@@ -28,6 +29,7 @@ app.add_middleware(
 )
 
 DATA_DIR = (Path(__file__).resolve().parent.parent / "data").resolve()
+STATIC_DIR = (Path(__file__).resolve().parent.parent / "static").resolve()
 
 # -------------------------
 # 日付正規化（多形式対応）
@@ -137,6 +139,10 @@ def find_head_zodiac(bd_str: str, ranges: List[Dict[str, Any]]) -> str:
 @app.get("/health")
 def health():
     return {"ok": True, "timestamp": datetime.utcnow().isoformat() + "Z"}
+
+@app.get("/tools/palm-reading")
+def palm_reading_tool():
+    return FileResponse(STATIC_DIR / "palm_reading.html")
 
 @app.post("/diagnose", response_model=DiagnoseOut)
 def diagnose(payload: DiagnoseIn):

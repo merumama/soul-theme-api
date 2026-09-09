@@ -1,0 +1,927 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>手の甲リーディングツール｜よしみの手相観</title>
+<style>
+  :root{
+    --bg:#faf6f0;
+    --panel:#ffffff;
+    --ink:#3a332b;
+    --ink-soft:#6b6255;
+    --accent:#8a6d4a;
+    --accent-soft:#c9a876;
+    --tree:#5f7a52;
+    --tree-soft:#e7edde;
+    --crystal:#5c7f95;
+    --crystal-soft:#e3edf1;
+    --line:#e6ddcf;
+    --warn:#b5654b;
+    --radius:14px;
+    --shadow:0 2px 10px rgba(80,60,30,0.08);
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:"Hiragino Sans","Yu Gothic",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+    line-height:1.7;
+  }
+  .wrap{
+    max-width:1180px;
+    margin:0 auto;
+    padding:24px 16px 80px;
+  }
+  header.top{
+    text-align:center;
+    margin-bottom:28px;
+  }
+  header.top h1{
+    font-size:1.55rem;
+    margin:0 0 6px;
+    letter-spacing:.02em;
+  }
+  header.top p{
+    margin:0;
+    color:var(--ink-soft);
+    font-size:.92rem;
+  }
+  .layout{
+    display:grid;
+    grid-template-columns: 1.35fr 1fr;
+    gap:20px;
+    align-items:start;
+  }
+  @media (max-width: 980px){
+    .layout{grid-template-columns:1fr;}
+    .result-col{position:static !important;}
+  }
+  .card{
+    background:var(--panel);
+    border-radius:var(--radius);
+    box-shadow:var(--shadow);
+    padding:20px 22px;
+    margin-bottom:18px;
+    border:1px solid var(--line);
+  }
+  .card h2{
+    font-size:1.05rem;
+    margin:0 0 4px;
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  .card h2 .num{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    width:24px;height:24px;
+    border-radius:50%;
+    background:var(--accent-soft);
+    color:#fff;
+    font-size:.75rem;
+    flex:none;
+  }
+  .card .lead{
+    color:var(--ink-soft);
+    font-size:.85rem;
+    margin:0 0 14px;
+  }
+  fieldset{
+    border:none;
+    margin:0 0 14px;
+    padding:0;
+  }
+  legend{
+    font-weight:600;
+    font-size:.88rem;
+    margin-bottom:8px;
+    color:var(--accent);
+  }
+  .options{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+  }
+  .opt{
+    position:relative;
+  }
+  .opt input{
+    position:absolute;
+    opacity:0;
+    width:100%;height:100%;
+    top:0;left:0;
+    cursor:pointer;
+    margin:0;
+  }
+  .opt label{
+    display:block;
+    padding:9px 14px;
+    border:1px solid var(--line);
+    border-radius:999px;
+    font-size:.85rem;
+    cursor:pointer;
+    background:#fdfbf8;
+    transition:all .15s ease;
+    user-select:none;
+  }
+  .opt input:checked + label{
+    background:var(--accent);
+    border-color:var(--accent);
+    color:#fff;
+  }
+  .opt input:focus-visible + label{
+    outline:2px solid var(--accent);
+    outline-offset:2px;
+  }
+  .subblock{
+    margin-top:10px;
+    padding:14px 16px;
+    border-radius:10px;
+    background:#fdfaf5;
+    border:1px dashed var(--line);
+    font-size:.86rem;
+    display:none;
+  }
+  .subblock.show{display:block;}
+  .subblock p{margin:.3em 0;}
+  .type-tree{border-color:var(--tree) !important; background:var(--tree-soft) !important;}
+  .type-crystal{border-color:var(--crystal) !important; background:var(--crystal-soft) !important;}
+  .finger-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(210px,1fr));
+    gap:14px;
+  }
+  .finger-card{
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:12px 14px;
+    background:#fdfbf8;
+  }
+  .finger-card h3{
+    margin:0 0 4px;
+    font-size:.92rem;
+  }
+  .finger-card .planet{
+    font-size:.75rem;
+    color:#fff;
+    background:var(--accent-soft);
+    padding:2px 8px;
+    border-radius:999px;
+    display:inline-block;
+    margin-bottom:6px;
+  }
+  .finger-card textarea{
+    width:100%;
+    margin-top:8px;
+    font-size:.8rem;
+    font-family:inherit;
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:6px 8px;
+    resize:vertical;
+    min-height:44px;
+    background:#fff;
+  }
+  .finger-card .meta-desc{
+    font-size:.8rem;
+    color:var(--ink-soft);
+  }
+  .hint{
+    font-size:.78rem;
+    color:var(--ink-soft);
+    margin-top:4px;
+  }
+  input[type=text]{
+    font-family:inherit;
+    font-size:.9rem;
+    padding:8px 10px;
+    border:1px solid var(--line);
+    border-radius:8px;
+    background:#fff;
+  }
+  .clientrow{
+    display:flex;
+    flex-wrap:wrap;
+    gap:12px;
+    margin-bottom:6px;
+  }
+  .clientrow label{
+    font-size:.8rem;
+    color:var(--ink-soft);
+    display:block;
+    margin-bottom:3px;
+  }
+  .result-col{position:sticky; top:16px;}
+  #resultPanel h2{margin-top:0;}
+  #reportText{
+    width:100%;
+    min-height:420px;
+    font-family:inherit;
+    font-size:.88rem;
+    line-height:1.8;
+    padding:14px;
+    border:1px solid var(--line);
+    border-radius:10px;
+    background:#fffefb;
+    white-space:pre-wrap;
+  }
+  .btnrow{
+    display:flex;
+    gap:8px;
+    margin-top:10px;
+    flex-wrap:wrap;
+  }
+  button{
+    font-family:inherit;
+    font-size:.85rem;
+    padding:9px 16px;
+    border-radius:999px;
+    border:1px solid var(--accent);
+    background:var(--accent);
+    color:#fff;
+    cursor:pointer;
+  }
+  button.secondary{
+    background:#fff;
+    color:var(--accent);
+  }
+  button:active{transform:translateY(1px);}
+  .badge-empty{
+    font-size:.82rem;
+    color:var(--ink-soft);
+    padding:20px 4px;
+  }
+  .footnote{
+    font-size:.72rem;
+    color:var(--ink-soft);
+    text-align:center;
+    margin-top:30px;
+  }
+  .divider{
+    height:1px;
+    background:var(--line);
+    margin:16px 0;
+  }
+  .tag-mixed{border-color:var(--accent) !important; background:#f1e9db !important;}
+  @media print{
+    .card:not(#resultCard){display:none;}
+    .layout{display:block;}
+    button{display:none;}
+    #reportText{border:none; padding:0;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <h1>✋ 手の甲リーディングツール</h1>
+    <p>よしみの手相観メソッドに基づく「魂のカタチ」診断アシスタント（クライアント・友人向けセッション用）</p>
+  </header>
+
+  <div class="card">
+    <div class="clientrow">
+      <div>
+        <label for="clientName">クライアント名</label>
+        <input type="text" id="clientName" placeholder="例）ゆきさん">
+      </div>
+      <div>
+        <label for="sessionDate">実施日</label>
+        <input type="text" id="sessionDate" placeholder="例）2026-09-09">
+      </div>
+      <div>
+        <label for="handSide">見ている手</label>
+        <select id="handSide" style="font-family:inherit;font-size:.9rem;padding:8px 10px;border:1px solid var(--line);border-radius:8px;">
+          <option value="">未選択</option>
+          <option value="左手">左手（今世のテーマ・受け取る／女性性）</option>
+          <option value="右手">右手（テーマを乗り越えた後の形・与える／男性性）</option>
+          <option value="両手">両手を統合</option>
+        </select>
+      </div>
+    </div>
+    <p class="hint">※ 手の甲＝生まれ持った「魂のカタチ（宿命）」、手のひら＝「今ここの潜在意識の状態」。このツールは手の甲リーディングに特化しています（手相三大線などの手のひらリーディングは対象外）。<br>※ 左右の手：「左＝今世抱えているテーマ、右＝そのテーマを乗り越えた後の形」という捉え方と、「左＝受け取る（女性性）、右＝与える（男性性）」という捉え方の両方が使われます。両手を見比べると変化がわかりやすくなります。</p>
+  </div>
+
+  <div class="layout">
+    <div class="input-col">
+
+      <!-- 1: 手の大きさ・指の長さ -->
+      <div class="card">
+        <h2><span class="num">1</span>手の大きさ・指の長さ（魂のテンポ）</h2>
+        <p class="lead">大きさ・指の長さは優劣ではなく「魂が得意とするテンポ」を示します。</p>
+        <fieldset data-key="handSize">
+          <legend>手の大きさ</legend>
+          <div class="options">
+            <div class="opt"><input type="radio" name="handSize" id="hs-big" value="big"><label for="hs-big">大きい手（指が長い）</label></div>
+            <div class="opt"><input type="radio" name="handSize" id="hs-small" value="small"><label for="hs-small">小さい手（指が短い）</label></div>
+          </div>
+        </fieldset>
+        <fieldset data-key="fingerLength">
+          <legend>指の長さ（手のひらとの比率）</legend>
+          <div class="options">
+            <div class="opt"><input type="radio" name="fingerLength" id="fl-long" value="long"><label for="fl-long">長い指</label></div>
+            <div class="opt"><input type="radio" name="fingerLength" id="fl-short" value="short"><label for="fl-short">短い指</label></div>
+          </div>
+        </fieldset>
+        <div id="tempoSubtype" class="subblock"></div>
+      </div>
+
+      <!-- 2: 樹木型 / クリスタル型 -->
+      <div class="card">
+        <h2><span class="num">2</span>樹木型／クリスタル型 診断</h2>
+        <p class="lead">当てはまる特徴を選んでください（複数選択可）。優勢な方が「基本タイプ」の目安になります。</p>
+        <fieldset data-key="typeFeatures">
+          <legend>手の特徴チェック</legend>
+          <div class="options" id="typeFeatureOptions"></div>
+        </fieldset>
+        <div id="typeResult" class="subblock"></div>
+
+        <div id="treeSubtypeBlock" style="display:none;">
+          <div class="divider"></div>
+          <fieldset data-key="treeSubtype">
+            <legend>🌳 樹木型の詳細分類（指の関節の発達）</legend>
+            <div class="options" id="treeSubtypeOptions"></div>
+          </fieldset>
+          <div id="treeSubtypeResult" class="subblock"></div>
+        </div>
+
+        <div id="crystalSubtypeBlock" style="display:none;">
+          <div class="divider"></div>
+          <fieldset data-key="crystalSubtype">
+            <legend>💎 クリスタル型の詳細分類（優位なエネルギー）</legend>
+            <div class="options" id="crystalSubtypeOptions"></div>
+          </fieldset>
+          <div id="crystalSubtypeResult" class="subblock"></div>
+        </div>
+      </div>
+
+      <!-- 3: 指先の形 -->
+      <div class="card">
+        <h2><span class="num">3</span>指先の形（エネルギーの受け取り方）</h2>
+        <p class="lead">爪の上部の幅が広いほど現実的・行動的、狭いほど感受性・理想性が高まります。最も特徴的な指を基準に選んでください。</p>
+        <fieldset data-key="fingertip">
+          <legend>指先の形</legend>
+          <div class="options" id="fingertipOptions"></div>
+        </fieldset>
+        <div id="fingertipResult" class="subblock"></div>
+      </div>
+
+      <!-- 4: 爪の形 -->
+      <div class="card">
+        <h2><span class="num">4</span>爪の形（魂の感受性）</h2>
+        <p class="lead">爪は魂が生命エネルギーを受け取るバリア＝感受性の器です。</p>
+        <fieldset data-key="nailShape">
+          <legend>爪の形（全体的に特徴的な形）</legend>
+          <div class="options" id="nailShapeOptions"></div>
+        </fieldset>
+        <div id="nailShapeResult" class="subblock"></div>
+        <div class="divider"></div>
+        <fieldset data-key="nailWidth">
+          <legend>爪の幅（補足）</legend>
+          <div class="options">
+            <div class="opt"><input type="radio" name="nailWidth" id="nw-narrow" value="narrow"><label for="nw-narrow">幅が狭い</label></div>
+            <div class="opt"><input type="radio" name="nailWidth" id="nw-wide" value="wide"><label for="nw-wide">幅が広い</label></div>
+            <div class="opt"><input type="radio" name="nailWidth" id="nw-none" value=""><label for="nw-none">特になし</label></div>
+          </div>
+        </fieldset>
+        <div id="nailWidthResult" class="subblock"></div>
+      </div>
+
+      <!-- 5: 指の柔軟性 -->
+      <div class="card">
+        <h2><span class="num">5</span>指の柔軟性（適応力と対人スタンス）</h2>
+        <fieldset data-key="flexibility">
+          <legend>指の柔軟性</legend>
+          <div class="options" id="flexibilityOptions"></div>
+        </fieldset>
+        <div id="flexibilityResult" class="subblock"></div>
+      </div>
+
+      <!-- 6: 指ごとの意味 -->
+      <div class="card">
+        <h2><span class="num">6</span>指ごとの意味（親指〜小指）</h2>
+        <p class="lead">よしみの手相観では、西洋手相術をベースに各指を惑星のエネルギーとして読み解きます。特徴的な指があればメモを追加してください。</p>
+        <div class="finger-grid" id="fingerGrid"></div>
+      </div>
+
+      <!-- 8: その他の視覚サイン -->
+      <div class="card">
+        <h2><span class="num">8</span>その他の視覚サイン（手首・肉の厚み・爪の状態）</h2>
+        <p class="lead">Basic1の基本分類に加え、講座内で語られている補助的な観察ポイントです。</p>
+        <fieldset data-key="wrist">
+          <legend>手首の太さ</legend>
+          <div class="options" id="wristOptions"></div>
+        </fieldset>
+        <div id="wristResult" class="subblock"></div>
+        <div class="divider"></div>
+        <fieldset data-key="otherSigns">
+          <legend>気になる爪・肌のサイン（複数選択可）</legend>
+          <div class="options" id="otherSignOptions"></div>
+        </fieldset>
+        <div id="otherSignResult" class="subblock"></div>
+      </div>
+
+      <!-- 9: 魂の癖 -->
+      <div class="card">
+        <h2><span class="num">9</span>魂の癖のサイン（設計図 と 記憶の癖 を見分ける）</h2>
+        <p class="lead">以下は「魂のカタチ」そのものではなく、生きる中で重なった"癖"のサインです。責めるためではなく、愛をもって見つめ直すための視点として使います。</p>
+        <fieldset data-key="habitSigns">
+          <legend>気になるサイン（複数選択可）</legend>
+          <div class="options" id="habitSignOptions"></div>
+        </fieldset>
+        <div id="habitResult" class="subblock"></div>
+      </div>
+
+    </div>
+
+    <div class="result-col">
+      <div class="card" id="resultCard">
+        <h2>📝 リーディングレポート</h2>
+        <p class="lead">選択に応じて自動生成されます。セッション前後で自由に編集・加筆してからコピー／印刷できます。</p>
+        <div id="resultPanel">
+          <textarea id="reportText" spellcheck="false"></textarea>
+        </div>
+        <div class="btnrow">
+          <button id="copyBtn">📋 コピー</button>
+          <button id="printBtn" class="secondary">🖨️ 印刷</button>
+          <button id="resetBtn" class="secondary">↺ すべてリセット</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <p class="footnote">本ツールは「よしみの手相観講座」の内容をもとに作成した個人利用のリーディング補助ツールです。診断結果はすべて手動で編集可能です。</p>
+</div>
+
+<script>
+/* ============================================================
+   データ定義（よしみの手相観 Basic1 テキスト＋講座音声より作成）
+   ============================================================ */
+
+const TYPE_FEATURES = [
+  {id:"joint-nodo", label:"指が節ばっている", side:"tree"},
+  {id:"joint-smooth", label:"指が節ばっていない・滑らか", side:"crystal"},
+  {id:"finger-long", label:"手のひらに対して指が長い", side:"tree"},
+  {id:"finger-short", label:"手のひらに対して指が短い", side:"crystal"},
+  {id:"kime-rough", label:"手の甲のキメが粗い・力強さがある", side:"tree"},
+  {id:"kime-fine", label:"手の甲のキメが細かい・透明感がある", side:"crystal"},
+  {id:"vessel-visible", label:"血管や骨が浮き出ている", side:"tree"},
+  {id:"soft-touch", label:"全体的に感触がソフト", side:"crystal"},
+];
+
+const TYPE_RESULT_TEXT = {
+  tree: `【樹木型（思考エネルギー優位）】
+じっくりと自分の哲学を磨き、体現し、ペースやスペースを守りながら学びを得ることが本来の魂の求める姿です。「深く考え、理解し、整えること」を喜びとします。
+得意分野：情報整理・分析・論理的理解、物事の仕組み化・体系化、専門性を磨くこと、秩序ある環境での高いパフォーマンス。`,
+  crystal: `【クリスタル型（感覚・感情・肉体エネルギー優位）】
+本能・欲求、喜怒哀楽、感覚・感性を大切に、ありのままの自分を体現していくことが本来の魂の求める姿です。「生きることそのものを感じること」を通して学んでいきます。
+得意分野：感覚や直感を大切にした即座の行動、相手を感じ取るコミュニケーション力、体験を通じた学び、"今この瞬間"を大切にする生き方。`,
+  mixed: `【混合タイプ（樹木×クリスタルの融合）】
+思考・秩序と、感覚・流れの両方の要素を併せ持ちます。場面に応じて、秩序的に考え動くときと感覚で流れに乗るときを柔軟に使い分けられる、器の広さを持つタイプです。
+得意分野：調整役・ファシリテーション、カウンセリング／コーチング、教育・場づくり・チーム運営、論理と感性をつなぐ企画や創作活動。
+※ 秩序と感覚のあいだで揺れやすく、決めきれずに動けなくなることがありますが、これは矛盾ではなく「器の広さ」の証です。`
+};
+
+const TREE_SUBTYPES = [
+  {id:"tree1", label:"① 第一関節優位（分析・理論型）",
+   text:`第一関節（指先寄り）が発達し、第二関節は控えめ。細部にこだわり緻密な分析ができ、思考の深さ・理論構築が得意。知識を積み重ね体系化し、観察・洞察力が高い一方、実務や現場応用には時間がかかることがあり、神経が細やかで過敏になりやすい傾向も。適職：研究職・企画など。`},
+  {id:"tree2", label:"② 第二関節優位（実務・整理型）",
+   text:`第二関節（中央）が発達し、第一関節は控えめ。実務処理力・整理整頓が得意で、知識を活かして形にできる。空間・人間関係・物質の秩序を整える力があり、他者のアイデアを現場で形にできる実用派。適職：事務・管理など。`},
+  {id:"tree3", label:"③ 両方の関節が発達（研究・哲学型）",
+   text:`第一関節・第二関節の両方が発達。知識と実務の両方を整然と扱え、深い分析と客観的視点を持つ。理屈・証拠を重視し論理的に整理、長期計画・構造設計に強い。哲学・歴史・科学など探究心が高く、感情に流されず冷静沈着、堅実で忍耐力がある。適職：教育・設計など。`},
+  {id:"tree4", label:"④ 第一関節が非常に発達（理論構築・計画設計型）",
+   text:`極めて第一関節が発達し目立つ。高い知性と論理的思考力を持ち、計画立案・設計図作成が得意。確実に現実化するためのプロセス構築力に優れる。`},
+  {id:"tree5", label:"⑤ 第二関節が非常に発達（秩序維持・整頓型）",
+   text:`極めて第二関節が発達し目立つ。環境・空間・習慣・行動を秩序立てる力に優れ、整理整頓・清潔感・規律正しさを維持する。実用性を重視し無駄なく効率的に動く。`},
+];
+
+const CRYSTAL_SUBTYPES = [
+  {id:"crystal-sense", label:"① 感覚型クリスタル（すっと繊細タイプ）",
+   text:`指先が細く透明感のある繊細な手。五感・直感が鋭く、空気感や雰囲気を敏感に察知し、微細なニュアンス・美しさ・色・音・香りを捉えるのが得意。芸術性を活かした表現（アート・文章・写真・音楽など）や、周囲の微細な変化をキャッチし調整する役割が向く。行動までのスピードは速い（感じた瞬間にインスピレーションが湧きすぐ動ける）。`},
+  {id:"crystal-emotion", label:"② 感情型クリスタル（小学生のような滑らかタイプ）",
+   text:`指が滑らかで節が目立たず丸みがありソフトな感触。喜怒哀楽の感情を豊かに感じ、感情表現が素直で場の共感力が高い。感情を通じて人とつながり、表現活動（話す・書く・踊る・歌うなど）で感情を形にする、仲間づくりや場を和ませる役割が得意。行動までのスピードは中間（感情で感じ、味わった後に動く）。`},
+  {id:"crystal-body", label:"③ 肉体型クリスタル（赤ちゃん〜幼児のようなぽっちゃりタイプ）",
+   text:`第3指節が太く全体的にむっちり・ぽっちゃり。本能・欲求が素直に表れ、食べたい・眠りたい・触れたいなどの生命欲求が強い。身体で感じること（触れる・動く・体験する）が得意で、身体性を通じて安心感を与える存在。行動までのスピードは遅め（身体が動く準備が整うまでゆっくり）。`},
+];
+
+const FINGERTIP_SHAPES = [
+  {id:"hera", label:"ヘラ型（しゃもじ型・広がる指先）",
+   text:`指先の幅が最も広く、極めて現実的・常識的。独創性があり既存の枠組みに従わず新しい方法を生み出す力、技術革新・独立・起業のパワーを持つ。他者評価を気にせず自分の道を信じて進む強さがあり、道具を使う・現実作業に強い、身体で動きながら考えるタイプ。▶ 魂：動かしてナンボ／実践を通じて開く革命魂。`},
+  {id:"square", label:"四角型（直線的・角がある指先）",
+   text:`規則正しさ・秩序・整理整頓を大切にし、ルールに従って行動、時間や約束を守り社会的習慣を大事にする。実際的な職業を好み安定した環境で力を発揮する。秩序を通じて現実に成果を積み重ねていく。▶ 魂：整える・仕組む・守る役割。`},
+  {id:"cone", label:"円錐型（丸く柔らかな指先）",
+   text:`指先が狭くエネルギーがすぐ入りやすい。芸術的・直感的・衝動的で、理想主義、美しさ・調和・心地よさを大切にする。感受性豊かで直感が鋭く、思考より感覚で動くため行動が早い。相手や空気を"受け取る力"が強い。▶ 魂：繋ぐ・包む・共鳴する役割。`},
+  {id:"pointed", label:"尖頭型（とがった指先）",
+   text:`先端が尖っているほどエネルギーが入りやすい。理想主義・スピリチュアルな感受性が強く、精神的・霊的な領域で生きることを望む。美や調和を大切にし感化力を持つが、物質世界に適応しづらく理想と現実のギャップに苦しむことも。▶ 魂：見えない世界との翻訳者。`},
+];
+
+const NAIL_SHAPES = [
+  {id:"nail-standard", label:"標準型",
+   text:`第一関節の半分くらいの長さで、半月は爪の長さの約5分の1ほど。健康で明朗活発な性格を表す。`},
+  {id:"nail-long", label:"長い形",
+   text:`第一関節の半分より長く縦に長細い。長いほどおとなしく温和で我慢強く、神秘的なものに惹かれ芸術家タイプとも言われる。ただし長方形の場合は神経質になりやすく、呼吸器を害しやすい傾向も。`},
+  {id:"nail-short", label:"短い形",
+   text:`第一関節の半分より短く角ばって見える。手先が器用でひらめきがあり探求心が強く、精力的で努力家。短いほど批判的・懐疑的な傾向があり、極端に短く平らな場合は喧嘩早く闘争を好むことも。極端に小さい場合は集中力が増し、自己アピールは苦手で消極的になりやすい。`},
+  {id:"nail-triangle", label:"三角形",
+   text:`神経質で気にする性格。神経過敏で人とは違う細かい部分に目が行き、斬新なアイデアを持つことが多い。`},
+  {id:"nail-rtriangle", label:"逆三角形",
+   text:`押しが強く積極的に行動するタイプ。`},
+  {id:"nail-curved", label:"湾曲形（半月が湾曲）",
+   text:`穏やかで他者とのバランスを取ることが得意。執念深さがなく物事を穏やかに進められる。`},
+  {id:"nail-straight", label:"直線形（半月が直線的）",
+   text:`忍耐強く、執念や執着を持ちやすい傾向。その反面、孤独になりやすい面もある。`},
+  {id:"nail-reversed", label:"反り爪（強く反り返っている）",
+   text:`直線型の性質がさらに強まった状態。反発しやすい・受け入れがたい・意見をはじきやすい傾向と、孤独になりやすい面が強まる。一方でうまく活かせば強いリーダーシップにつながる。親指以外の指（円錐型・尖頭型など）で強く反っている場合は、次元の違うものをキャッチする独特の感覚・霊的な感度のサインとしても読まれる。`},
+];
+
+const NAIL_WIDTH = {
+  narrow: `幅が狭い爪：筋力的な強さよりも神経質さ・苦労性の傾向。意地っ張りな面もあり、繊細で霊的な性格を持つことが多い。幅が狭いほどデリケートさが増す。`,
+  wide: `幅が広い爪：筋力的な強さを持ち、心が広く明朗な性格。基本的に正直で誠実、大胆で肝が座っており面倒見が良い。自己主張が強くプライドが高い面も。`
+};
+
+const WRIST_THICKNESS = [
+  {id:"wrist-thick", label:"太い手首",
+   text:`エネルギーの放出・吸入をコントロールする"蛇口"が大きく開いているタイプ。いざという時に大きくエネルギーを放出できる、エンジンの大きさそのもの。`},
+  {id:"wrist-thin", label:"細い手首",
+   text:`繊細で刺激に弱く、内に秘めることが得意なタイプ。誰彼構わず心を開くのではなく、信頼できる相手だけに開く"安全地帯"を持つ。`},
+];
+
+const OTHER_SIGNS = [
+  {id:"other-halfmoon", label:"爪の半月が小さい・ほとんどない",
+   text:`標準（爪の長さの約5分の1）より小さい・ない場合、水分保湿量や活力の目安として、やや消耗気味のサインとして見ることがあります。`},
+  {id:"other-sunken", label:"爪が沈み込んでいる（周りの肉にめり込んで見える）",
+   text:`自分の実際の筋力よりも強い圧を無意識にかけやすいサイン。慢性的な腰の負担（無理のしすぎ）と関連づけて読まれることがあります。`},
+  {id:"other-flesh-wide", label:"爪に対して指先の肉の幅が広い",
+   text:`腰など体の中心部に負荷がかかりやすいタイプ。無理をしすぎないことがテーマになりやすい。`},
+  {id:"other-flesh-thin", label:"爪の幅に対して指先の肉が薄い",
+   text:`繊細さ・感受性の高さのサインとして読みます。`},
+  {id:"other-spot", label:"手の甲にシミがある（樹木型に見えるのにシミがある等）",
+   text:`本来クリスタル型の資質を持ちながら、思考・忍耐・責任感を鍛えて樹木型のように生きてきた"隠れクリスタル"のサインとされることがあります（本来の資質のまま生きる許可が出ると、シミが薄くなることも）。`},
+];
+
+const FLEXIBILITY = [
+  {id:"flex-soft", label:"柔らかい指（曲げやすく、しなやか）",
+   text:`感受性が高く共感力があり、状況に柔軟に対応できる。相手の気持ちや場の空気を自然に読み、相手に合わせられる優しさと受容力を持つ。魂の傾向：相手に合わせ、調和しながら生きることを大切にするタイプ。`},
+  {id:"flex-hard", label:"硬い指（まっすぐで曲げにくい）",
+   text:`意志が強く自分軸が明確で、信念を貫く力がある。空気に流されず自分のペースで動き、自分の輪郭をしっかり示して生きられる。魂の傾向：信念の軸を保ち、世界の中で自分の意志を立てることを大切にするタイプ。`},
+  {id:"flex-mixed", label:"部分的に柔らかい・硬い（混合型）",
+   text:`状況によって柔らかく対応するときと、しっかり立つときがあり、繊細なバランス感覚を持つ。他者との距離感を探りながら調整できる。魂の傾向：揺らぎの中で調整しながら、他者や世界と関わっていくことを大切にするタイプ。`},
+  {id:"flex-curved-in", label:"指が内側に曲がっている",
+   text:`金銭や物を貯える力があり、注意深く意志が強い。競争や困難を乗り越えることに喜びを感じ、経済的に成功しやすい傾向。一方で利己的・倹約家・秘密主義・頑固で保守的な面が出て、人間関係で孤立することも。魂の傾向：守る力・貯える力で自分の安定を作り、その土台の上で人生を進めていくタイプ。`},
+];
+
+const FINGERS = [
+  {id:"thumb", name:"親指", planet:"惑星に属さない「自分」＝司令塔",
+   text:`親指だけは特定の惑星に属さず、「アイデンティティ（自分らしさ・信念）」そのものを表す司令塔の指とされます。木星・土星・金星・水星という他の4本（惑星のエネルギーの受信庫）が、「本当の自分」と一致した使われ方をしているかを横からチェックする役割です。
+・太陽＝男性性のエネルギーとも結び付けられ、低い位置から出ている（下から支えるように出ている）親指は、下から支えるパワー・大きな包容力を持つサイン。
+・テーマになりやすいのは、信念を伝えようとしつつ、周囲との調和を優先してそれを後回しにする癖を手放すこと。「守る力」は誰かの希望を助けるためではなく、自分自身の希望を成し遂げることに使うのが本来の姿。
+・親指の爪に入った強い縦のライン（乾燥じわとは別のはっきりした線）は、父親・祖父など身内の男性性からの圧のプログラムを示すことがあり、中指の状態とセットで読まれます。
+・人と出会い、ぶつかる体験そのものが「親指＝アイデンティティ」を鍛える実践トレーニングになります。`},
+  {id:"index", name:"人差し指", planet:"木星（Jupiter）",
+   text:`木星＝自分の行く先を指し示すエネルギー。自分にとってどんな理想があり、どの方向に進みたいかを示す指で、女性性・母親との関係性が映し出されやすい指でもあります。
+・第二関節から爪に向かって中指側にねじれている場合、幼少期に外圧（特に母親）によって、本来まっすぐ進みたかった方向を「ねじらされた」ことが定着したサインとされます。ねじれではなく指全体が中指側に「引っ張られた」ようにずれている場合も、同様に"合わせなければならないことをやってきた"履歴を示しますが、力学的な出方が異なります。
+・爪に入った黒い縦線は「母からの圧」のサイン。母の評価や視線を無意識に基準にして物事を選ぶ癖が固着していることを示し、気づきとともに薄くなっていきます。
+・第二関節の膨らみは、この指では「計画・スケジュールを整える」ことに頭を使う傾向として細分化されます。
+・テーマの問いかけ：「これ、本当に私がやりたいことかな？」`},
+  {id:"middle", name:"中指", planet:"土星（Saturn）",
+   text:`土星＝忍耐・継続・努力・社会性・責任感・正義感のエネルギー。まっすぐ整った中指は、社会的な対応能力や現実対応力（やると決めたらやり切る力）の高さを表し、仕事・経済活動の領域にも出やすい指です。魂の取り扱いの「中心軸」になりやすく、他の指（他の惑星のエネルギー）がここに引き寄せられることもあります。
+・男性性・父親的存在を象徴する指でもあり、第一関節にほくろがある場合は「社会とどう向き合うか」がテーマで、父親的なエネルギーを前にすると社会的な場面で弱気になる癖として表れることがあります（親指のライン＝父的存在からの圧、とセットで読まれます）。
+・薬指側に曲がっている場合、現実的に形にはしていくものの、最後に踏み出す段階で意識がふっと折れてしまう傾向のサインとされます。
+・第二関節の膨らみは、この指では「現実的な整理整頓・人間関係やオペレーションの構築」に頭を使う傾向として細分化されます。`},
+  {id:"ring", name:"薬指", planet:"金星（Venus）",
+   text:`金星＝人生の主役として輝くエネルギー。自分の魅力・自己表現・自分らしい輝き方への自信を象徴し、お金にならない"好きなこと"（音楽・芸術など）に特に表れやすい指です。副交感神経的に独立した指ともされ、他の指と質感や表情が違って見えることがあります。
+・ほくろがある場合は、自己表現や輝くことを抑えている癖が強いサインとされます。
+・乾燥や意識の向きにくさ（他の指より爪の輪郭がぼやける、甘皮が荒れているなど）が出やすい指で、「自分なりの輝き方は何？」という問いかけが有効です。
+・指が傾いていたり普段と違う動きをする場合は「何かを伝えようとしている」サインとして着目します。`},
+  {id:"pinky", name:"小指", planet:"水星（Mercury）",
+   text:`水星＝コミュニケーションのエネルギー。人に気持ちを伝えることと、人に委ねる・甘える・頼ることの両方向を象徴します。
+・第一関節が曲がっている場合「委ねる・甘える」がテーマになりやすく、幼少期に「一人で頑張りなさい」と刷り込まれた記憶が背景にあることも。「委ねるためには他者が必要」であり、一人で抱え込むことを手放すことがテーマです。
+・第二関節の張り・膨らみは、女性性（受容・育む力）の抱え込みや、第二チャクラ（子宮・生殖領域）周辺のエネルギーの滞り、時に代々（祖母・母）続くパターンと関連づけて読まれることがあります。
+・かぶれ・あかぎれがある場合は、コミュニケーションを抑えているエネルギーが溢れて皮膚に出たサイン（ほくろより緊急性が高く、"今まさに"起きていることを示します）。`},
+];
+
+const HABIT_SIGNS = [
+  {id:"habit-twist", label:"特定の関節だけ曲がっている・ねじれている",
+   text:`癖のサイン：本来まっすぐ出せるはずの指が、抑圧のエネルギーによって曲がったりねじれたりして表れています。責めるためではなく、「どこに負荷がかかっていたのか」を優しく見つめるサインとして扱いましょう。気づくと自然にほどけていくことが多いサインです。`},
+  {id:"habit-scar", label:"指に傷跡・タコ・硬直がある",
+   text:`癖のサイン：これまで生き抜いてきた証、魂ががんばってきた痕跡です。何を抑えてきたのかを愛をもって見つめ直すきっかけになります。`},
+  {id:"habit-joint-thick", label:"関節が極端に太い・固まっている",
+   text:`癖のサイン：気の流れの扱い方の"癖"が固定化し、局所的に凝縮して表れているサインとして読みます。まっすぐ動かすより「痛みを感じながらも動かし続けてきた」強い自己主張・痛みへの感受性の高さとしてポジティブに読むこともできます。`},
+  {id:"habit-mole", label:"ほくろがある",
+   text:`癖のサイン（慢性）：長年の我慢や圧の記憶が刻まれた印。いつできたか本人も意識していないことが多く、魂に刻まれた固定観念として、じっくり向き合うテーマになります。`},
+  {id:"habit-wound", label:"傷・かぶれ・あかぎれがある",
+   text:`癖のサイン（急性・今起きていること）：ほくろとは異なり、"今まさに"起きている直近のドラマやエネルギーの噴出のサインとされます。いつできたものかを確認すると、何が引き金になっているかが見えやすくなります。`},
+  {id:"habit-nailbite", label:"爪を噛む癖がある",
+   text:`癖のサイン：心が敏感に傷ついていることを知らせるSOSのサインとして読まれます。生まれ持った爪の形とは別の、後天的な状態として区別して扱います。`},
+];
+
+/* ============================================================
+   状態管理・レンダリング
+   ============================================================ */
+
+const state = {
+  handSize:"", fingerLength:"",
+  typeFeatures:new Set(),
+  treeSubtype:"", crystalSubtype:"",
+  fingertip:"", nailShape:"", nailWidth:"",
+  flexibility:"",
+  wrist:"",
+  otherSigns:new Set(),
+  habitSigns:new Set(),
+  fingerNotes:{}
+};
+
+function el(tag, cls, html){
+  const e = document.createElement(tag);
+  if(cls) e.className = cls;
+  if(html !== undefined) e.innerHTML = html;
+  return e;
+}
+
+function buildOptionGroup(container, items, name, multi){
+  container.innerHTML = "";
+  items.forEach(item=>{
+    const wrap = el("div","opt");
+    const input = document.createElement("input");
+    input.type = multi ? "checkbox" : "radio";
+    input.name = name;
+    input.id = name+"-"+item.id;
+    input.value = item.id;
+    const label = document.createElement("label");
+    label.htmlFor = input.id;
+    label.textContent = item.label;
+    wrap.appendChild(input);
+    wrap.appendChild(label);
+    container.appendChild(wrap);
+    input.addEventListener("change", onAnyChange);
+  });
+}
+
+buildOptionGroup(document.getElementById("typeFeatureOptions"), TYPE_FEATURES, "typeFeature", true);
+buildOptionGroup(document.getElementById("treeSubtypeOptions"), TREE_SUBTYPES, "treeSubtype", false);
+buildOptionGroup(document.getElementById("crystalSubtypeOptions"), CRYSTAL_SUBTYPES, "crystalSubtype", false);
+buildOptionGroup(document.getElementById("fingertipOptions"), FINGERTIP_SHAPES, "fingertip", false);
+buildOptionGroup(document.getElementById("nailShapeOptions"), NAIL_SHAPES, "nailShape", false);
+buildOptionGroup(document.getElementById("flexibilityOptions"), FLEXIBILITY, "flexibility", false);
+buildOptionGroup(document.getElementById("habitSignOptions"), HABIT_SIGNS, "habitSign", true);
+buildOptionGroup(document.getElementById("wristOptions"), WRIST_THICKNESS, "wrist", false);
+buildOptionGroup(document.getElementById("otherSignOptions"), OTHER_SIGNS, "otherSign", true);
+
+// 指ごとの意味カード
+const fingerGrid = document.getElementById("fingerGrid");
+FINGERS.forEach(f=>{
+  const card = el("div","finger-card");
+  card.innerHTML = `<h3>${f.name}</h3><span class="planet">${f.planet}</span>
+    <div class="meta-desc">${f.text}</div>
+    <textarea placeholder="この指について気づいたことをメモ（長さ・傾き・関節・爪の状態など）" data-finger="${f.id}"></textarea>`;
+  fingerGrid.appendChild(card);
+});
+fingerGrid.querySelectorAll("textarea").forEach(t=>{
+  t.addEventListener("input", ()=>{
+    state.fingerNotes[t.dataset.finger] = t.value;
+    renderReport();
+  });
+});
+
+document.querySelectorAll('input[name="handSize"], input[name="fingerLength"]').forEach(i=>i.addEventListener("change", onAnyChange));
+document.querySelectorAll('input[name="nailWidth"]').forEach(i=>i.addEventListener("change", onAnyChange));
+document.getElementById("clientName").addEventListener("input", renderReport);
+document.getElementById("sessionDate").addEventListener("input", renderReport);
+document.getElementById("handSide").addEventListener("change", renderReport);
+
+function onAnyChange(){
+  syncState();
+  renderSubblocks();
+  renderReport();
+}
+
+function syncState(){
+  state.handSize = (document.querySelector('input[name="handSize"]:checked')||{}).value || "";
+  state.fingerLength = (document.querySelector('input[name="fingerLength"]:checked')||{}).value || "";
+  state.typeFeatures = new Set([...document.querySelectorAll('input[name="typeFeature"]:checked')].map(i=>i.value));
+  state.treeSubtype = (document.querySelector('input[name="treeSubtype"]:checked')||{}).value || "";
+  state.crystalSubtype = (document.querySelector('input[name="crystalSubtype"]:checked')||{}).value || "";
+  state.fingertip = (document.querySelector('input[name="fingertip"]:checked')||{}).value || "";
+  state.nailShape = (document.querySelector('input[name="nailShape"]:checked')||{}).value || "";
+  state.nailWidth = (document.querySelector('input[name="nailWidth"]:checked')||{}).value || "";
+  state.flexibility = (document.querySelector('input[name="flexibility"]:checked')||{}).value || "";
+  state.wrist = (document.querySelector('input[name="wrist"]:checked')||{}).value || "";
+  state.otherSigns = new Set([...document.querySelectorAll('input[name="otherSign"]:checked')].map(i=>i.value));
+  state.habitSigns = new Set([...document.querySelectorAll('input[name="habitSign"]:checked')].map(i=>i.value));
+}
+
+function computeBaseType(){
+  let treeScore = 0, crystalScore = 0;
+  TYPE_FEATURES.forEach(f=>{
+    if(state.typeFeatures.has(f.id)){
+      if(f.side === "tree") treeScore++; else crystalScore++;
+    }
+  });
+  if(treeScore === 0 && crystalScore === 0) return null;
+  if(treeScore > 0 && crystalScore > 0 && Math.abs(treeScore-crystalScore) <= 1) return "mixed";
+  return treeScore >= crystalScore ? "tree" : "crystal";
+}
+
+function renderSubblocks(){
+  // テンポ
+  const tempoBlock = document.getElementById("tempoSubtype");
+  if(state.handSize || state.fingerLength){
+    let lines = [];
+    if(state.handSize === "big") lines.push("大きい手：丁寧にじっくり物事に向き合い、細部を感じ取ることが得意。エネルギーを内側でゆっくり扱う、ゆったりした魂のテンポ。");
+    if(state.handSize === "small") lines.push("小さい手：直感的に物事をとらえ行動に移すのが早い。全体像を捉え決断が早く、エネルギーを外側へ素早く放つ、速い魂のテンポ。");
+    if(state.fingerLength === "long") lines.push("長い指：丁寧に物事を考え、じっくり向き合う。細部への観察力が高く内省的で、思考・行動のテンポはゆっくり慎重。");
+    if(state.fingerLength === "short") lines.push("短い指：直感的に物事をとらえ即行動に移す。全体像を素早く掴み、テンポよく動き、行動力・推進力がある。");
+    tempoBlock.innerHTML = lines.map(l=>`<p>${l}</p>`).join("");
+    tempoBlock.classList.add("show");
+  } else {
+    tempoBlock.classList.remove("show");
+  }
+
+  // 樹木/クリスタル 判定
+  const baseType = computeBaseType();
+  const typeResult = document.getElementById("typeResult");
+  const treeBlock = document.getElementById("treeSubtypeBlock");
+  const crystalBlock = document.getElementById("crystalSubtypeBlock");
+  if(baseType){
+    typeResult.classList.add("show");
+    typeResult.className = "subblock show " + (baseType === "tree" ? "type-tree" : baseType === "crystal" ? "type-crystal" : "tag-mixed");
+    typeResult.innerHTML = `<p>${TYPE_RESULT_TEXT[baseType].replace(/\n/g,"<br>")}</p>`;
+    treeBlock.style.display = (baseType === "tree" || baseType === "mixed") ? "block" : "none";
+    crystalBlock.style.display = (baseType === "crystal" || baseType === "mixed") ? "block" : "none";
+  } else {
+    typeResult.classList.remove("show");
+    treeBlock.style.display = "none";
+    crystalBlock.style.display = "none";
+  }
+
+  renderSimpleResult("treeSubtypeResult", TREE_SUBTYPES, state.treeSubtype);
+  renderSimpleResult("crystalSubtypeResult", CRYSTAL_SUBTYPES, state.crystalSubtype);
+  renderSimpleResult("fingertipResult", FINGERTIP_SHAPES, state.fingertip);
+  renderSimpleResult("nailShapeResult", NAIL_SHAPES, state.nailShape);
+  renderSimpleResult("flexibilityResult", FLEXIBILITY, state.flexibility);
+  renderSimpleResult("wristResult", WRIST_THICKNESS, state.wrist);
+
+  const otherSignResult = document.getElementById("otherSignResult");
+  if(state.otherSigns.size){
+    otherSignResult.classList.add("show");
+    otherSignResult.innerHTML = OTHER_SIGNS.filter(o=>state.otherSigns.has(o.id)).map(o=>`<p>${o.text}</p>`).join("");
+  } else {
+    otherSignResult.classList.remove("show");
+  }
+
+  const nailWidthResult = document.getElementById("nailWidthResult");
+  if(state.nailWidth && NAIL_WIDTH[state.nailWidth]){
+    nailWidthResult.classList.add("show");
+    nailWidthResult.innerHTML = `<p>${NAIL_WIDTH[state.nailWidth]}</p>`;
+  } else {
+    nailWidthResult.classList.remove("show");
+  }
+
+  const habitResult = document.getElementById("habitResult");
+  if(state.habitSigns.size){
+    habitResult.classList.add("show");
+    habitResult.innerHTML = HABIT_SIGNS.filter(h=>state.habitSigns.has(h.id)).map(h=>`<p>${h.text}</p>`).join("");
+  } else {
+    habitResult.classList.remove("show");
+  }
+}
+
+function renderSimpleResult(elId, items, selectedId){
+  const box = document.getElementById(elId);
+  const item = items.find(i=>i.id === selectedId);
+  if(item){
+    box.classList.add("show");
+    box.innerHTML = `<p>${item.text}</p>`;
+  } else {
+    box.classList.remove("show");
+  }
+}
+
+function renderReport(){
+  const name = document.getElementById("clientName").value.trim();
+  const date = document.getElementById("sessionDate").value.trim();
+  const side = document.getElementById("handSide").value;
+  const baseType = computeBaseType();
+
+  let out = [];
+  out.push(`━━━━━━━━━━━━━━━━━━━━━━━━`);
+  out.push(`手の甲リーディング レポート`);
+  out.push(`━━━━━━━━━━━━━━━━━━━━━━━━`);
+  if(name) out.push(`クライアント：${name} 様`);
+  if(date) out.push(`実施日：${date}`);
+  if(side) out.push(`見ている手：${side}`);
+  out.push("");
+
+  const tempoLines = [];
+  if(state.handSize === "big") tempoLines.push("大きい手：丁寧にじっくり物事に向き合い、細部を感じ取ることが得意。エネルギーを内側でゆっくり扱う、ゆったりした魂のテンポです。");
+  if(state.handSize === "small") tempoLines.push("小さい手：直感的に物事をとらえ行動に移すのが早い。全体像を捉え決断が早く、エネルギーを外側へ素早く放つ、速い魂のテンポです。");
+  if(state.fingerLength === "long") tempoLines.push("長い指：丁寧に物事を考え、じっくり向き合う。細部への観察力が高く内省的で、思考・行動のテンポはゆっくり慎重です。");
+  if(state.fingerLength === "short") tempoLines.push("短い指：直感的に物事をとらえ即行動に移す。全体像を素早く掴み、テンポよく動き、行動力・推進力があります。");
+  if(tempoLines.length){
+    out.push("【1. 魂のテンポ】");
+    out.push(...tempoLines);
+    out.push("");
+  }
+
+  if(baseType){
+    out.push("【2. 基本タイプ】");
+    out.push(TYPE_RESULT_TEXT[baseType]);
+    const ts = TREE_SUBTYPES.find(t=>t.id===state.treeSubtype);
+    if(ts){ out.push(""); out.push(`▷ 詳細分類：${ts.label}`); out.push(ts.text); }
+    const cs = CRYSTAL_SUBTYPES.find(t=>t.id===state.crystalSubtype);
+    if(cs){ out.push(""); out.push(`▷ 詳細分類：${cs.label}`); out.push(cs.text); }
+    out.push("");
+  }
+
+  const ft = FINGERTIP_SHAPES.find(t=>t.id===state.fingertip);
+  if(ft){
+    out.push("【3. 指先の形】");
+    out.push(`${ft.label}`);
+    out.push(ft.text);
+    out.push("");
+  }
+
+  const ns = NAIL_SHAPES.find(t=>t.id===state.nailShape);
+  if(ns || state.nailWidth){
+    out.push("【4. 爪の形】");
+    if(ns){ out.push(`${ns.label}：${ns.text}`); }
+    if(state.nailWidth && NAIL_WIDTH[state.nailWidth]) out.push(NAIL_WIDTH[state.nailWidth]);
+    out.push("");
+  }
+
+  const fx = FLEXIBILITY.find(t=>t.id===state.flexibility);
+  if(fx){
+    out.push("【5. 指の柔軟性】");
+    out.push(`${fx.label}：${fx.text}`);
+    out.push("");
+  }
+
+  const fingerNoteEntries = FINGERS.filter(f=> (state.fingerNotes[f.id] && state.fingerNotes[f.id].trim()));
+  out.push("【6. 指ごとの意味（親指〜小指）】");
+  FINGERS.forEach(f=>{
+    out.push(`◆ ${f.name}（${f.planet}）`);
+    out.push(f.text);
+    const note = state.fingerNotes[f.id];
+    if(note && note.trim()) out.push(`　メモ：${note.trim()}`);
+    out.push("");
+  });
+
+  const wr = WRIST_THICKNESS.find(t=>t.id===state.wrist);
+  if(wr || state.otherSigns.size){
+    out.push("【8. その他の視覚サイン】");
+    if(wr) out.push(`${wr.label}：${wr.text}`);
+    OTHER_SIGNS.filter(o=>state.otherSigns.has(o.id)).forEach(o=>{
+      out.push(`・${o.label}：${o.text}`);
+    });
+    out.push("");
+  }
+
+  if(state.habitSigns.size){
+    out.push("【9. 魂の癖のサイン（設計図と記憶の癖の違い）】");
+    HABIT_SIGNS.filter(h=>state.habitSigns.has(h.id)).forEach(h=>{
+      out.push(`・${h.label}`);
+      out.push(h.text);
+    });
+    out.push("");
+    out.push("※ 癖は責めるものではなく、これまで生き抜いてきた証。「これはカタチなのか、癖なのか」という視点を持ち、愛をもって見つめ直すことが大切です。");
+  }
+
+  const reportEl = document.getElementById("reportText");
+  reportEl.value = out.join("\n").replace(/\n{3,}/g,"\n\n").trim();
+}
+
+document.getElementById("copyBtn").addEventListener("click", ()=>{
+  const ta = document.getElementById("reportText");
+  ta.select();
+  document.execCommand("copy");
+  const btn = document.getElementById("copyBtn");
+  const original = btn.textContent;
+  btn.textContent = "✅ コピーしました";
+  setTimeout(()=>{btn.textContent = original;}, 1500);
+});
+
+document.getElementById("printBtn").addEventListener("click", ()=> window.print());
+
+document.getElementById("resetBtn").addEventListener("click", ()=>{
+  if(!confirm("すべての選択とメモをリセットします。よろしいですか？")) return;
+  document.querySelectorAll('input[type=radio], input[type=checkbox]').forEach(i=>i.checked=false);
+  document.querySelectorAll('.finger-card textarea').forEach(t=>t.value="");
+  document.getElementById("clientName").value="";
+  document.getElementById("sessionDate").value="";
+  document.getElementById("handSide").value="";
+  state.fingerNotes = {};
+  syncState();
+  renderSubblocks();
+  renderReport();
+});
+
+// 初期描画
+syncState();
+renderSubblocks();
+renderReport();
+</script>
+</body>
+</html>
