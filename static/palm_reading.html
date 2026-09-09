@@ -491,13 +491,19 @@
 
       <!-- 8: その他の視覚サイン -->
       <div class="card">
-        <h2><span class="num">8</span>その他の視覚サイン（手首・肉の厚み・爪の状態）</h2>
+        <h2><span class="num">8</span>その他の視覚サイン（手首・手の厚み・爪の状態）</h2>
         <p class="lead">Basic1の基本分類に加え、講座内で語られている補助的な観察ポイントです。</p>
         <fieldset data-key="wrist">
           <legend>手首の太さ</legend>
           <div class="options" id="wristOptions"></div>
         </fieldset>
         <div id="wristResult" class="subblock"></div>
+        <div class="divider"></div>
+        <fieldset data-key="handThickness">
+          <legend>手のひら・手の甲の厚み（樹木型／クリスタル型とは別軸）</legend>
+          <div class="options" id="handThicknessOptions"></div>
+        </fieldset>
+        <div id="handThicknessResult" class="subblock"></div>
         <div class="divider"></div>
         <fieldset data-key="otherSigns">
           <legend>気になる爪・肌のサイン（複数選択可）</legend>
@@ -631,6 +637,13 @@ const WRIST_THICKNESS = [
    text:`繊細で刺激に弱く、内に秘めることが得意なタイプ。誰彼構わず心を開くのではなく、信頼できる相手だけに開く"安全地帯"を持つ。`},
 ];
 
+const HAND_THICKNESS = [
+  {id:"hand-thick", label:"厚い手（ぷっくり・分厚い）",
+   text:`分厚さは「情の厚さ」として読みます。友情・人情・愛情など、人間ならではの感情のエネルギーが深く、人間味の厚みがあるタイプ。肉厚な分、触れる・触れられることへの体感的な感度（センサー）も鋭く、特にクリスタル型で分厚い手の人は、五感の喜び・肉体の心地よさを扱うボディワークやセラピーなどと相性が良いとされます（樹木型かクリスタル型かという判定軸とは別の、独立した観察ポイントです）。`},
+  {id:"hand-thin", label:"薄い手",
+   text:`分厚い手と対比すると、情の厚さの表れ方は控えめで、感覚や情報をさらりと軽やかに扱うタイプとして読まれることがあります。`},
+];
+
 const OTHER_SIGNS = [
   {id:"other-halfmoon", label:"爪の半月が小さい・ほとんどない",
    text:`標準（爪の長さの約5分の1）より小さい・ない場合、水分保湿量や活力の目安として、やや消耗気味のサインとして見ることがあります。`},
@@ -727,7 +740,7 @@ const state = {
   treeSubtype:"", crystalSubtype:"",
   fingertip:"", nailShape:"", nailWidth:"", nailCurve:"",
   flexibility:"",
-  wrist:"",
+  wrist:"", handThickness:"",
   otherSigns:new Set(),
   habitSigns:new Set(),
   fingerNotes:{},
@@ -768,6 +781,7 @@ buildOptionGroup(document.getElementById("nailShapeOptions"), NAIL_SHAPES, "nail
 buildOptionGroup(document.getElementById("flexibilityOptions"), FLEXIBILITY, "flexibility", false);
 buildOptionGroup(document.getElementById("habitSignOptions"), HABIT_SIGNS, "habitSign", true);
 buildOptionGroup(document.getElementById("wristOptions"), WRIST_THICKNESS, "wrist", false);
+buildOptionGroup(document.getElementById("handThicknessOptions"), HAND_THICKNESS, "handThickness", false);
 buildOptionGroup(document.getElementById("otherSignOptions"), OTHER_SIGNS, "otherSign", true);
 
 // 指ごとの意味カード
@@ -818,6 +832,7 @@ function syncState(){
   state.nailCurve = (document.querySelector('input[name="nailCurve"]:checked')||{}).value || "";
   state.flexibility = (document.querySelector('input[name="flexibility"]:checked')||{}).value || "";
   state.wrist = (document.querySelector('input[name="wrist"]:checked')||{}).value || "";
+  state.handThickness = (document.querySelector('input[name="handThickness"]:checked')||{}).value || "";
   state.otherSigns = new Set([...document.querySelectorAll('input[name="otherSign"]:checked')].map(i=>i.value));
   state.habitSigns = new Set([...document.querySelectorAll('input[name="habitSign"]:checked')].map(i=>i.value));
   FINGERS.forEach(f=>{
@@ -876,6 +891,7 @@ function renderSubblocks(){
   renderSimpleResult("nailShapeResult", NAIL_SHAPES, state.nailShape);
   renderSimpleResult("flexibilityResult", FLEXIBILITY, state.flexibility);
   renderSimpleResult("wristResult", WRIST_THICKNESS, state.wrist);
+  renderSimpleResult("handThicknessResult", HAND_THICKNESS, state.handThickness);
 
   const otherSignResult = document.getElementById("otherSignResult");
   if(state.otherSigns.size){
@@ -995,9 +1011,11 @@ function renderReport(){
   });
 
   const wr = WRIST_THICKNESS.find(t=>t.id===state.wrist);
-  if(wr || state.otherSigns.size){
+  const ht = HAND_THICKNESS.find(t=>t.id===state.handThickness);
+  if(wr || ht || state.otherSigns.size){
     out.push("【8. その他の視覚サイン】");
     if(wr) out.push(`${wr.label}：${wr.text}`);
+    if(ht) out.push(`${ht.label}：${ht.text}`);
     OTHER_SIGNS.filter(o=>state.otherSigns.has(o.id)).forEach(o=>{
       out.push(`・${o.label}：${o.text}`);
     });
