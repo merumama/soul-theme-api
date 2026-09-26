@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>指の意味事典</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&display=swap">
+<style>
+  :root{
+    --bg:#faf6f0;
+    --panel:#fffdfa;
+    --ink:#3a332b;
+    --ink-soft:#6b6255;
+    --accent:#8a6d4a;
+    --accent-soft:#c9a876;
+    --line:#e6ddcf;
+    --surface-soft:#fdfaf3;
+    --on-accent:#fffdfa;
+    --radius:14px;
+    --shadow:0 2px 10px rgba(80,60,30,0.08);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#211c17;
+      --panel:#2b241d;
+      --ink:#ece5d8;
+      --ink-soft:#b3a894;
+      --accent:#d3b184;
+      --accent-soft:#8a6d4a;
+      --line:#443b30;
+      --surface-soft:#332b22;
+      --on-accent:#221a10;
+      --shadow:0 2px 14px rgba(0,0,0,0.35);
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#211c17;
+    --panel:#2b241d;
+    --ink:#ece5d8;
+    --ink-soft:#b3a894;
+    --accent:#d3b184;
+    --accent-soft:#8a6d4a;
+    --line:#443b30;
+    --surface-soft:#332b22;
+    --on-accent:#221a10;
+    --shadow:0 2px 14px rgba(0,0,0,0.35);
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:"Hiragino Sans","Yu Gothic",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+    line-height:1.8;
+  }
+  h1, h2, h3{
+    font-family:"Shippori Mincho","Hiragino Mincho ProN","Yu Mincho",serif;
+    font-weight:700;
+    text-wrap:balance;
+  }
+  .wrap{
+    max-width:820px;
+    margin:0 auto;
+    padding:28px 18px 80px;
+  }
+  header.top{
+    text-align:center;
+    margin-bottom:20px;
+  }
+  header.top h1{
+    font-size:1.6rem;
+    margin:0 0 8px;
+    letter-spacing:.03em;
+  }
+  header.top p{
+    margin:0;
+    color:var(--ink-soft);
+    font-size:.9rem;
+  }
+  .backlink{
+    display:inline-block;
+    margin-top:10px;
+    font-size:.82rem;
+    color:var(--accent);
+    text-decoration:none;
+    border-bottom:1px solid var(--accent-soft);
+  }
+  .backlink:hover{opacity:.75;}
+  nav.index{
+    position:sticky;
+    top:0;
+    z-index:5;
+    display:flex;
+    gap:6px;
+    flex-wrap:wrap;
+    justify-content:center;
+    background:var(--bg);
+    padding:12px 8px;
+    margin-bottom:18px;
+    border-bottom:1px solid var(--line);
+  }
+  nav.index a{
+    font-size:.82rem;
+    text-decoration:none;
+    color:var(--ink);
+    background:var(--surface-soft);
+    border:1px solid var(--line);
+    padding:6px 14px;
+    border-radius:999px;
+    white-space:nowrap;
+  }
+  nav.index a:hover{border-color:var(--accent); color:var(--accent);}
+  .lead-note{
+    background:var(--surface-soft);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:16px 20px;
+    font-size:.86rem;
+    color:var(--ink-soft);
+    margin-bottom:26px;
+  }
+  .entry{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    box-shadow:var(--shadow);
+    padding:26px 26px 24px;
+    margin-bottom:22px;
+    scroll-margin-top:64px;
+  }
+  .entry-head{
+    display:flex;
+    align-items:center;
+    gap:16px;
+    margin-bottom:6px;
+  }
+  .glyph{
+    flex:none;
+    width:52px;
+    height:52px;
+    border-radius:50%;
+    background:var(--surface-soft);
+    border:1px solid var(--line);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:1.5rem;
+    color:var(--accent);
+  }
+  .entry-head h2{
+    margin:0;
+    font-size:1.35rem;
+  }
+  .entry-head .planet-name{
+    margin:2px 0 0;
+    font-size:.82rem;
+    color:var(--accent);
+    letter-spacing:.03em;
+  }
+  .keywords{
+    display:flex;
+    flex-wrap:wrap;
+    gap:6px;
+    margin:14px 0 16px;
+  }
+  .keywords span{
+    font-size:.74rem;
+    background:var(--accent-soft);
+    color:var(--on-accent);
+    padding:3px 11px;
+    border-radius:999px;
+  }
+  .entry-body p{
+    margin:0 0 14px;
+    font-size:.92rem;
+  }
+  .signs-title{
+    font-size:.8rem;
+    font-weight:600;
+    color:var(--accent);
+    text-transform:uppercase;
+    letter-spacing:.05em;
+    margin:18px 0 8px;
+    border-top:1px dashed var(--line);
+    padding-top:14px;
+  }
+  dl.signs{
+    margin:0;
+  }
+  dl.signs dt{
+    font-size:.86rem;
+    font-weight:600;
+    margin-top:10px;
+  }
+  dl.signs dt::before{
+    content:"▸ ";
+    color:var(--accent);
+  }
+  dl.signs dd{
+    margin:4px 0 0;
+    font-size:.83rem;
+    color:var(--ink-soft);
+  }
+  .footnote{
+    font-size:.75rem;
+    color:var(--ink-soft);
+    text-align:center;
+    margin-top:36px;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <h1>📖 指の意味事典</h1>
+    <p>よしみの手相観メソッドに基づく、親指〜小指の意味リファレンス</p>
+    <a class="backlink" href="/tools/palm-reading">← 手の甲リーディングツールに戻る</a>
+  </header>
+
+  <nav class="index">
+    <a href="#thumb">親指</a>
+    <a href="#index">人差し指</a>
+    <a href="#middle">中指</a>
+    <a href="#ring">薬指</a>
+    <a href="#pinky">小指</a>
+  </nav>
+
+  <p class="lead-note">よしみの手相観は西洋手相術をベースにしており、4本の指（人差し指〜小指）はそれぞれ惑星のエネルギーと結びついています。親指だけは特定の惑星に属さず、他の4本が「本当の自分」と一致した使われ方をしているかをチェックする、独立した「自分・司令塔」の指として読みます。各指の下にある「気になるサインと意味」は、その指に特徴的な"魂の癖"のサイン — 生まれ持った設計図そのものではなく、生きる中で重なった記憶の癖として、責めずに見つめるためのヒントです。</p>
+
+  <section class="entry" id="thumb">
+    <div class="entry-head">
+      <div class="glyph">私</div>
+      <div>
+        <h2>親指</h2>
+        <p class="planet-name">惑星に属さない「自分」＝司令塔（太陽＝男性性のエネルギーとも結びつく）</p>
+      </div>
+    </div>
+    <div class="keywords">
+      <span>アイデンティティ</span><span>信念</span><span>司令塔</span><span>太陽・男性性</span><span>守る力</span>
+    </div>
+    <div class="entry-body">
+      <p>親指だけは特定の惑星に属さず、「アイデンティティ（自分らしさ・信念）」そのものを表す司令塔の指とされます。木星・土星・金星・水星という他の4本（惑星のエネルギーの受信庫）が、「本当の自分」と一致した使われ方をしているかを横からチェックする役割です。太陽＝男性性のエネルギーとも結び付けられ、低い位置から出ている（下から支えるように出ている）親指は、下から支えるパワー・大きな包容力を持つサインとされます。テーマになりやすいのは、信念を伝えようとしつつ、周囲との調和を優先してそれを後回しにする癖を手放すこと。「守る力」は誰かの希望を助けるためではなく、自分自身の希望を成し遂げることに使うのが本来の姿です。人と出会い、ぶつかる体験そのものが「親指＝アイデンティティ」を鍛える実践トレーニングになります。</p>
+    </div>
+    <div class="signs-title">気になるサインと意味</div>
+    <dl class="signs">
+      <dt>爪に強い縦のラインが入っている（乾燥じわとは別のはっきりした線）</dt>
+      <dd>父親・祖父など身内の男性性からの圧のプログラムを示すことがあり、中指の状態とセットで読まれます。</dd>
+    </dl>
+  </section>
+
+  <section class="entry" id="index">
+    <div class="entry-head">
+      <div class="glyph">木</div>
+      <div>
+        <h2>人差し指</h2>
+        <p class="planet-name">木星（Jupiter）</p>
+      </div>
+    </div>
+    <div class="keywords">
+      <span>方向性</span><span>理想</span><span>母親との関係</span><span>女性性</span>
+    </div>
+    <div class="entry-body">
+      <p>木星＝自分の行く先を指し示すエネルギー。自分にとってどんな理想があり、どの方向に進みたいかを示す指で、女性性・母親との関係性が映し出されやすい指でもあります。第二関節の膨らみは、この指では「計画・スケジュールを整える」ことに頭を使う傾向として細分化されます。テーマの問いかけ：「これ、本当に私がやりたいことかな？」</p>
+    </div>
+    <div class="signs-title">気になるサインと意味</div>
+    <dl class="signs">
+      <dt>第二関節から爪にかけて中指側にねじれている</dt>
+      <dd>幼少期に外圧（特に母親）によって、本来まっすぐ進みたかった方向を「ねじらされた」ことが定着したサインとされます。気づくとともにほどけていくことが多いサインです。</dd>
+      <dt>指全体が中指側に「ずれて」いる（ねじれとは違い角度がずれている）</dt>
+      <dd>ねじれと同様に"合わせなければならないことをやってきた"履歴を示しますが、力学的な出方が異なります。</dd>
+      <dt>爪に黒い縦線が入っている</dt>
+      <dd>母からの圧のサイン。母の評価や視線を無意識に基準にして物事を選ぶ癖が固着していることを示し、気づくと薄くなっていきます。</dd>
+    </dl>
+  </section>
+
+  <section class="entry" id="middle">
+    <div class="entry-head">
+      <div class="glyph">土</div>
+      <div>
+        <h2>中指</h2>
+        <p class="planet-name">土星（Saturn）</p>
+      </div>
+    </div>
+    <div class="keywords">
+      <span>忍耐</span><span>責任感</span><span>社会性</span><span>正義感</span><span>父親的存在</span>
+    </div>
+    <div class="entry-body">
+      <p>土星＝忍耐・継続・努力・社会性・責任感・正義感のエネルギー。まっすぐ整った中指は、社会的な対応能力や現実対応力（やると決めたらやり切る力）の高さを表し、仕事・経済活動の領域にも出やすい指です。魂の取り扱いの「中心軸」になりやすく、他の指（他の惑星のエネルギー）がここに引き寄せられることもあります。男性性・父親的存在を象徴する指でもあります。第二関節の膨らみは、この指では「現実的な整理整頓・人間関係やオペレーションの構築」に頭を使う傾向として細分化されます。</p>
+    </div>
+    <div class="signs-title">気になるサインと意味</div>
+    <dl class="signs">
+      <dt>第一関節にほくろがある</dt>
+      <dd>「社会とどう向き合うか」がテーマ。父親的なエネルギーを前にすると社会的な場面で弱気になる癖として表れることがあります（親指の縦ラインとセットで読まれます）。</dd>
+      <dt>薬指側に曲がっている</dt>
+      <dd>現実的に形にはしていくものの、最後に踏み出す段階で意識がふっと折れてしまう傾向のサインとされます。</dd>
+    </dl>
+  </section>
+
+  <section class="entry" id="ring">
+    <div class="entry-head">
+      <div class="glyph">金</div>
+      <div>
+        <h2>薬指</h2>
+        <p class="planet-name">金星（Venus）</p>
+      </div>
+    </div>
+    <div class="keywords">
+      <span>自己表現</span><span>輝き</span><span>魅力・自信</span><span>好きなこと</span>
+    </div>
+    <div class="entry-body">
+      <p>金星＝人生の主役として輝くエネルギー。自分の魅力・自己表現・自分らしい輝き方への自信を象徴し、お金にならない"好きなこと"（音楽・芸術など）に特に表れやすい指です。副交感神経的に独立した指ともされ、他の指と質感や表情が違って見えることがあります。</p>
+    </div>
+    <div class="signs-title">気になるサインと意味</div>
+    <dl class="signs">
+      <dt>ほくろがある</dt>
+      <dd>自己表現や輝くことを抑えている癖が強いサインとされます。</dd>
+      <dt>乾燥している・他の指より意識が向きにくい（爪の輪郭がぼやける、甘皮が荒れているなど）</dt>
+      <dd>自分の魅力への自信が向けられにくくなっているサイン。「自分なりの輝き方は何？」という問いかけが有効です。</dd>
+      <dt>指が傾いている・普段と違う動きをする</dt>
+      <dd>「何かを伝えようとしている」サインとして着目します。</dd>
+    </dl>
+  </section>
+
+  <section class="entry" id="pinky">
+    <div class="entry-head">
+      <div class="glyph">水</div>
+      <div>
+        <h2>小指</h2>
+        <p class="planet-name">水星（Mercury）</p>
+      </div>
+    </div>
+    <div class="keywords">
+      <span>コミュニケーション</span><span>委ねる・甘える</span><span>頼る</span>
+    </div>
+    <div class="entry-body">
+      <p>水星＝コミュニケーションのエネルギー。人に気持ちを伝えることと、人に委ねる・甘える・頼ることの両方向を象徴します。「委ねるためには他者が必要」であり、一人で抱え込むことを手放すことがテーマです。</p>
+    </div>
+    <div class="signs-title">気になるサインと意味</div>
+    <dl class="signs">
+      <dt>第一関節が曲がっている</dt>
+      <dd>「委ねる・甘える」がテーマになりやすく、幼少期に「一人で頑張りなさい」と刷り込まれた記憶が背景にあることも。</dd>
+      <dt>第二関節が張っている・膨らんでいる</dt>
+      <dd>女性性（受容・育む力）の抱え込みや、第二チャクラ（子宮・生殖領域）周辺のエネルギーの滞り、時に代々（祖母・母）続くパターンと関連づけて読まれることがあります。</dd>
+      <dt>かぶれ・あかぎれがある</dt>
+      <dd>コミュニケーションを抑えているエネルギーが溢れて皮膚に出たサイン（ほくろより緊急性が高く、"今まさに"起きていることを示します）。</dd>
+    </dl>
+  </section>
+
+  <p class="footnote">本ページは「よしみの手相観講座」の内容をもとに作成した個人利用のリファレンスです。診断は<a class="backlink" href="/tools/palm-reading">手の甲リーディングツール</a>で行えます。</p>
+</div>
+</body>
+</html>

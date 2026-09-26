@@ -144,6 +144,10 @@ def health():
 def palm_reading_tool():
     return FileResponse(STATIC_DIR / "palm_reading.html")
 
+@app.get("/tools/finger-dictionary")
+def finger_dictionary_tool():
+    return FileResponse(STATIC_DIR / "finger_dictionary.html")
+
 @app.post("/diagnose", response_model=DiagnoseOut)
 def diagnose(payload: DiagnoseIn):
     # 外から入った birthdate はここまでで YYYY-MM-DD に正規化済み
