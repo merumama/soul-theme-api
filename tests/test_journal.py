@@ -10,7 +10,7 @@ client = TestClient(app)
 def test_journal_page_served():
     r = client.get("/journal/")
     assert r.status_code == 200
-    assert "週次ジャーナル" in r.text
+    assert "週次ダイエットプラン" in r.text
 
 def test_journal_redirect():
     r = client.get("/journal", follow_redirects=False)

@@ -1,6 +1,6 @@
 {
-  "name": "ソウルダイエット 週次ジャーナル",
-  "short_name": "ジャーナル",
+  "name": "ソウルダイエット 週次ダイエットプラン",
+  "short_name": "ダイエットプラン",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
