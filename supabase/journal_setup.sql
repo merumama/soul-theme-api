@@ -23,7 +23,8 @@ create table if not exists public.weekly_entries (
   week_no      int  not null default 1,
   period_start date,
   content      jsonb not null default '{}'::jsonb,
-  status       text not null default 'draft' check (status in ('draft', 'submitted')),
+  status       text not null default 'draft',
+  plan_submitted_at timestamptz,
   submitted_at timestamptz,
   created_at   timestamptz not null default now(),
   updated_at   timestamptz not null default now()
@@ -89,7 +90,14 @@ create trigger members_before_write
   before insert or update on public.members
   for each row execute function public.members_before_write();
 
--- 更新日時・提出日時を自動で入れる
+-- 2段階提出（プラン提出 → 最終提出）。ステータスと、プラン提出後の 01〜03 の固定
+alter table public.weekly_entries add column if not exists plan_submitted_at timestamptz;
+
+alter table public.weekly_entries drop constraint if exists weekly_entries_status_check;
+alter table public.weekly_entries add constraint weekly_entries_status_check
+  check (status in ('draft', 'plan_submitted', 'submitted'));
+
+-- 提出日時を自動で入れる。プラン提出後は 01〜03 と週・期間を変えられないようにする
 create or replace function public.entries_before_write()
 returns trigger
 language plpgsql
@@ -99,6 +107,21 @@ begin
   if tg_op = 'UPDATE' then
     new.client_id  := old.client_id;
     new.created_at := old.created_at;
+    if old.status = 'plan_submitted' then
+      new.week_no      := old.week_no;
+      new.period_start := old.period_start;
+      new.content := new.content || jsonb_build_object(
+        's01', coalesce(old.content -> 's01', '{}'::jsonb),
+        's02', coalesce(old.content -> 's02', '{}'::jsonb),
+        's03', coalesce(old.content -> 's03', '{}'::jsonb));
+      if new.status = 'draft' then
+        new.status := 'plan_submitted';
+      end if;
+      new.plan_submitted_at := old.plan_submitted_at;
+    end if;
+  end if;
+  if new.status in ('plan_submitted', 'submitted') and new.plan_submitted_at is null then
+    new.plan_submitted_at := now();
   end if;
   if new.status = 'submitted' and (tg_op = 'INSERT' or old.status <> 'submitted') then
     new.submitted_at := now();
@@ -145,7 +168,7 @@ drop policy if exists members_coach_write on public.members;
 create policy members_coach_write on public.members for all to authenticated
   using (public.is_coach()) with check (public.is_coach());
 
--- weekly_entries：クライアントは自分のシートだけ。提出後は編集・削除不可。コーチは閲覧のみ
+-- weekly_entries：クライアントは自分のシートだけ。最終提出後は編集不可、プラン提出後は削除不可。コーチは閲覧のみ
 drop policy if exists entries_select on public.weekly_entries;
 create policy entries_select on public.weekly_entries for select to authenticated
   using (client_id = auth.uid() or public.is_coach());
@@ -154,7 +177,7 @@ create policy entries_insert on public.weekly_entries for insert to authenticate
   with check (client_id = auth.uid() and status = 'draft');
 drop policy if exists entries_update on public.weekly_entries;
 create policy entries_update on public.weekly_entries for update to authenticated
-  using (client_id = auth.uid() and status = 'draft')
+  using (client_id = auth.uid() and status in ('draft', 'plan_submitted'))
   with check (client_id = auth.uid());
 drop policy if exists entries_delete on public.weekly_entries;
 create policy entries_delete on public.weekly_entries for delete to authenticated
