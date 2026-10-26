@@ -95,3 +95,8 @@ soul_theme_api/
 - Operation: `POST /diagnose`
 - Request Body: `{ "birthdate": "YYYY-MM-DD" }`
 - Response: `{"dragon_head_zodiac":"○○座","dragon_tail_zodiac":"○○座","soul_theme":"●-●","reverse_theme":"●-●"}`
+
+## 週次ジャーナル（ソウルダイエット）
+- 画面：`/journal/`（スマホ対応。クライアントが毎週記入・提出、コーチが閲覧・コメント）
+- データ保存：Supabase。環境変数 `SUPABASE_URL` / `SUPABASE_ANON_KEY` が無い間は端末内だけの「お試しモード」
+- セットアップ手順：`supabase/JOURNAL_SETUP.md`

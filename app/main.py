@@ -1,11 +1,13 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, RedirectResponse
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, field_validator
 from typing import Dict, Any, List
 from datetime import datetime
 from pathlib import Path
 import json
+import os
 import re
 
 # ==========
@@ -148,6 +150,22 @@ def palm_reading_tool():
 def finger_dictionary_tool():
     return FileResponse(STATIC_DIR / "finger_dictionary.html")
 
+# 週次ジャーナル（static/journal）。Supabase の接続先（公開用キーなので埋め込んでよい）。
+# 環境変数 SUPABASE_URL / SUPABASE_ANON_KEY があればそちらを優先する
+JOURNAL_SUPABASE_URL = "https://foydbpxdrjkogxezgsax.supabase.co"
+JOURNAL_SUPABASE_KEY = "sb_publishable_Wh1Dx9P76saUyewrx34Otw_3VIgCDXy"
+
+@app.get("/journal", include_in_schema=False)
+def journal_redirect():
+    return RedirectResponse("/journal/")
+
+@app.get("/journal/config.json", include_in_schema=False)
+def journal_config():
+    return {
+        "supabaseUrl": os.environ.get("SUPABASE_URL", JOURNAL_SUPABASE_URL),
+        "supabaseAnonKey": os.environ.get("SUPABASE_ANON_KEY", JOURNAL_SUPABASE_KEY),
+    }
+
 @app.post("/diagnose", response_model=DiagnoseOut)
 def diagnose(payload: DiagnoseIn):
     # 外から入った birthdate はここまでで YYYY-MM-DD に正規化済み
@@ -180,3 +198,6 @@ def diagnose(payload: DiagnoseIn):
         raise HTTPException(status_code=500, detail=f"Missing master file: {e}")
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Internal error: {e}")
+
+# 他のルートより後にマウントすること（/journal/config.json を優先させるため）
+app.mount("/journal", StaticFiles(directory=STATIC_DIR / "journal", html=True), name="journal")
