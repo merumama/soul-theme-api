@@ -263,9 +263,9 @@ function renderLogin() {
         <button class="btn primary" type="submit">ログイン用メールを送る</button>
       </form>
       <form id="code-form" class="stack" hidden>
-        <p>メールを送りました。<br>届いたメール（英語の件名「Confirm your email address」または「Your Magic Link」）の中の<b>リンクを押して</b>ログインしてください。</p>
+        <p>メールを送りました。<br>件名「【ソウルダイエット】週次ダイエットプランログインのご案内」のメールの<b>「ログインする」ボタン</b>を押してください。</p>
         <p class="small muted">届かないときは、迷惑メールフォルダも確認してください。</p>
-        <label class="field"><span>メールに確認コードが書かれている場合は、ここに入力してもログインできます</span>
+        <label class="field"><span>ボタンが押せないときは、メールに書かれた確認コードを入力してください</span>
           <input name="code" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6,10}" placeholder="123456"></label>
         <button class="btn primary" type="submit">ログイン</button>
         <button class="link" type="button" data-act="login-back">メールアドレスを入れ直す</button>
@@ -338,9 +338,13 @@ async function renderClientHome() {
         <button class="btn" data-act="new-week" data-week="${latest.week_no + 1}" data-start="${esc(latest.period_start ? toISO(addDays(parseDate(latest.period_start), 7)) : "")}">白紙で第${latest.week_no + 1}週を作る</button>
       </div>
       <p class="small muted">コピーすると「01〜03 アクションプラン」を引き継ぎ、「04〜06 ジャーナル」は白紙になります。</p>`;
+  } else if (latest.status === "plan_submitted") {
+    action = `
+      <p>第${latest.week_no}週のプランを提出しました。1週間の実践と気づきを記録して、最後に「最終提出」をしましょう。</p>
+      <a class="btn primary" href="#/entry/${esc(latest.id)}">第${latest.week_no}週の記録をつける</a>`;
   } else {
     action = `
-      <p>第${latest.week_no}週を記入中です。</p>
+      <p>第${latest.week_no}週のアクションプランを記入中です。書けたら「プラン提出」をしましょう。</p>
       <a class="btn primary" href="#/entry/${esc(latest.id)}">第${latest.week_no}週の続きを書く</a>`;
   }
   $app.innerHTML = `
@@ -350,9 +354,10 @@ async function renderClientHome() {
 }
 
 function entryCard(e, fbCount, clickable) {
-  const status = e.status === "submitted"
-    ? `<span class="chip done">提出済み ${esc(stamp(e.submitted_at))}</span>`
-    : `<span class="chip draft">記入中</span>`;
+  const status = {
+    submitted: `<span class="chip done">最終提出済み ${esc(stamp(e.submitted_at))}</span>`,
+    plan_submitted: `<span class="chip plan">プラン提出済み ${esc(stamp(e.plan_submitted_at))}</span>`,
+  }[e.status] || `<span class="chip draft">プラン記入中</span>`;
   const fbBadge = fbCount ? `<span class="chip fb">フィードバック ${fbCount}件</span>` : "";
   const inner = `
     <div class="entry-card-main">
@@ -384,10 +389,10 @@ async function renderEntry(id) {
   const prev = siblings.filter((e) => e.week_no < entry.week_no).sort((a, b) => b.week_no - a.week_no)[0] || null;
   const isOwner = entry.client_id === me.user_id;
 
-  if (isOwner && entry.status === "draft") return renderEditor(entry, prev);
+  if (isOwner && entry.status !== "submitted") return renderEditor(entry, prev);
 
-  if (!isOwner && entry.status !== "submitted") {
-    $app.innerHTML = `<section class="card pad"><p>このシートはまだ提出されていません。提出されると読めるようになります。</p><a class="btn" href="#/client/${esc(entry.client_id)}">戻る</a></section>`;
+  if (!isOwner && entry.status === "draft") {
+    $app.innerHTML = `<section class="card pad"><p>このシートはまだプラン提出されていません。提出されると読めるようになります。</p><a class="btn" href="#/client/${esc(entry.client_id)}">戻る</a></section>`;
     return;
   }
   const feedback = await store.listFeedback([entry.id]);
@@ -524,25 +529,37 @@ function drawEditor(prev) {
     <label class="field"><span>来週、どうしてみたい？</span>
       <textarea data-path="content.s06.next" rows="3" placeholder="例：昼休みの5分歩きを続ける。">${esc(c.s06.next)}</textarea></label>`;
 
+  // プラン提出後は 01〜03 を固定し、04〜06 だけ記入する
+  const planLocked = entry.status === "plan_submitted";
+  const planView = planLocked ? viewSections(c) : null;
+  const plan = planLocked
+    ? `<div class="locked-note">プラン提出済み ${esc(stamp(entry.plan_submitted_at))}（01〜03は変更できません）</div>
+       ${["s01", "s02", "s03"].map((k) => sectionShell(k, planView[k])).join("")}`
+    : `${sectionShell("s01", s01, { clear: true })}
+       ${sectionShell("s02", s02, { clear: true })}
+       ${sectionShell("s03", s03, { clear: true })}`;
+  const submitBtn = planLocked
+    ? `<button class="btn primary" data-act="submit-final">最終提出</button>`
+    : `<button class="btn primary" data-act="submit-plan">プラン提出</button>`;
+
   const scrollY = window.scrollY;
   $app.innerHTML = `
     <a class="back" href="#/">← 一覧へ</a>
     <div class="sheet-title">ソウルダイエット｜1週間アクションプラン ＆ フィードバック</div>
-    ${sheetHead(entry, me.display_name, true)}
+    ${sheetHead(entry, me.display_name, !planLocked)}
     ${reminder}
     <div class="part-label">アクションプラン</div>
-    ${sectionShell("s01", s01, { clear: true })}
-    ${sectionShell("s02", s02, { clear: true })}
-    ${sectionShell("s03", s03, { clear: true })}
+    ${plan}
     <div class="part-label">実践・気づきジャーナル</div>
+    ${planLocked ? "" : `<p class="hint journal-hint">04〜06は、プラン提出のあと1週間かけて記入します（先に書いておいてもOKです）。</p>`}
     ${sectionShell("s04", s04, { clear: true })}
     ${sectionShell("s05", s05, { clear: true })}
     ${sectionShell("s06", s06, { clear: true })}
     <p class="note">※セッションでは、気になる思考や感情を一緒に「事実・解釈・ジャッジ・感情」に分けてみましょう。</p>
-    <div class="danger-zone"><button class="link danger" data-act="delete-draft">この下書きを削除する</button></div>
+    ${planLocked ? "" : `<div class="danger-zone"><button class="link danger" data-act="delete-draft">この下書きを削除する</button></div>`}
     <div class="submit-bar">
       <span id="save-state" class="save-state">${lastSaveOk ? "自動保存されます" : "保存できていません"}</span>
-      <button class="btn primary" data-act="submit">提出する</button>
+      ${submitBtn}
     </div>`;
   autosize($app);
   window.scrollTo(0, scrollY);
@@ -670,6 +687,7 @@ function renderView(entry, feedback, siblings, clientName, isOwner) {
   v.s04 = viewDays(entry);
   const fbOf = (sec) => feedback.find((f) => f.section === sec);
   const coach = me.role === "coach" && !isOwner;
+  const planOnly = entry.status === "plan_submitted";
 
   const fbBlock = (sec) => {
     const f = fbOf(sec);
@@ -708,14 +726,18 @@ function renderView(entry, feedback, siblings, clientName, isOwner) {
     <a class="back" href="${coach ? `#/client/${esc(entry.client_id)}` : "#/"}">← 一覧へ</a>
     <div class="sheet-title">ソウルダイエット｜1週間アクションプラン ＆ フィードバック</div>
     ${sheetHead(entry, clientName, false)}
-    <div class="submitted-note">提出済み ${esc(stamp(entry.submitted_at))}${coach ? "" : "（提出後は編集できません）"}</div>
+    ${planOnly
+      ? `<div class="locked-note">プラン提出済み ${esc(stamp(entry.plan_submitted_at))}・最終提出待ち</div>`
+      : `<div class="submitted-note">最終提出済み ${esc(stamp(entry.submitted_at))}${coach ? "" : "（提出後は編集できません）"}</div>`}
     ${!coach && overall ? `<section class="card pad fb-overall"><div class="fb-label">コーチからのフィードバック</div><p class="pre">${nl(overall.body)}</p></section>` : ""}
     <div class="part-label">アクションプラン</div>
-    ${["s01", "s02", "s03"].map((k) => sectionShell(k, v[k], { extra: fbBlock(k) })).join("")}
+    ${["s01", "s02", "s03"].map((k) => sectionShell(k, v[k], { extra: planOnly ? "" : fbBlock(k) })).join("")}
     <div class="part-label">実践・気づきジャーナル</div>
-    ${["s04", "s05", "s06"].map((k) => sectionShell(k, v[k], { extra: fbBlock(k) })).join("")}
-    ${coach ? `<section class="card pad">${fbBlock("overall")}</section>` : ""}
-    ${actions}`;
+    ${planOnly
+      ? `<section class="card pad"><p class="muted">04〜06（実践・振り返り・次週の選択）は、クライアントが最終提出すると表示されます。コメントも最終提出のあとに書けます。</p></section>`
+      : `${["s04", "s05", "s06"].map((k) => sectionShell(k, v[k], { extra: fbBlock(k) })).join("")}
+         ${coach ? `<section class="card pad">${fbBlock("overall")}</section>` : ""}
+         ${actions}`}`;
   $app.dataset.entryId = entry.id;
   autosize($app);
   window.scrollTo(0, 0);
@@ -790,12 +812,17 @@ async function renderCoachHome() {
     const mine = m.user_id ? entries.filter((e) => e.client_id === m.user_id).sort((a, b) => b.week_no - a.week_no) : [];
     const lastSubmitted = mine.find((e) => e.status === "submitted");
     const draft = mine.find((e) => e.status === "draft");
+    const planned = mine.find((e) => e.status === "plan_submitted");
     let status = "";
     let rank = 3;
     if (!m.user_id) { status = `<span class="chip off">まだログインしていません</span>`; rank = 4; }
     else if (lastSubmitted && !hasFb.has(lastSubmitted.id)) { status = `<span class="chip new">第${lastSubmitted.week_no}週 提出あり・未コメント</span>`; rank = 0; }
     else if (lastSubmitted) { status = `<span class="chip done">第${lastSubmitted.week_no}週 コメント済み</span>`; rank = 2; }
-    if (draft) status += `<span class="chip draft">第${draft.week_no}週 記入中</span>`;
+    if (planned) {
+      status += `<span class="chip plan">第${planned.week_no}週 プラン提出済み</span>`;
+      if (rank > 1) rank = 1;
+    }
+    if (draft) status += `<span class="chip draft">第${draft.week_no}週 プラン記入中</span>`;
     if (!status) status = `<span class="chip off">シートなし</span>`;
     const last = lastSubmitted ? `<div class="small muted">最終提出 ${esc(stamp(lastSubmitted.submitted_at))}</div>` : "";
     return {
@@ -860,7 +887,7 @@ function inviteText(url, member) {
     "",
     "▼はじめての方",
     "1. 上のURLを開き、「ログイン用メールを送る」を押す",
-    "2. 英語のメール（件名「Confirm your email address」）が届くので、中のリンクを押す",
+    "2. 届いたメール（件名「【ソウルダイエット】週次ダイエットプランログインのご案内」）の「ログインする」ボタンを押す",
     "3. 「第1週をはじめる」から記入できます",
     "",
     "▼2回目から",
@@ -880,8 +907,8 @@ async function renderCoachClient(userId) {
     <h1 class="page-title">${esc(m ? m.display_name || m.email : "クライアント")}</h1>
     ${m ? `<p class="muted small">${esc(m.email)}</p>` : ""}
     ${entries.length
-      ? `<div class="list">${entries.map((e) => entryCard(e, fb.filter((f) => f.entry_id === e.id).length, e.status === "submitted")).join("")}</div>
-         <p class="small muted">記入中のシートは、提出されると読めるようになります。</p>`
+      ? `<div class="list">${entries.map((e) => entryCard(e, fb.filter((f) => f.entry_id === e.id).length, e.status !== "draft")).join("")}</div>
+         <p class="small muted">プラン記入中のシートは、プラン提出されると読めるようになります。04〜06とコメントは最終提出のあとです。</p>`
       : `<p class="muted pad">まだシートがありません。</p>`}`;
 }
 
@@ -949,16 +976,23 @@ async function onClick(e) {
         drawEditor(prevCache);
         break;
       }
-      case "submit": {
+      case "submit-plan":
+      case "submit-final": {
+        const final = act === "submit-final";
         await flushSave();
         if (dirty || !lastSaveOk) { toast("保存できていません。電波を確認してから、もう一度押してください。"); return; }
-        if (!confirm("提出しますか？\n提出すると、このシートは編集できなくなります。")) return;
+        const msg = final
+          ? "最終提出しますか？\n提出すると、このシートは編集できなくなります。"
+          : "プランを提出しますか？\n提出すると、01〜03（アクションプラン）は変更できなくなります。\n04〜06は、このあと1週間かけて記入できます。";
+        if (!confirm(msg)) return;
         el.disabled = true;
         const id = editing.id;
         editing = null;
-        await store.submitEntry(id);
-        toast("提出しました。おつかれさまでした！");
+        if (final) await store.submitEntry(id);
+        else await store.submitPlan(id);
+        toast(final ? "最終提出しました。おつかれさまでした！" : "プランを提出しました。1週間の記録をつけていきましょう");
         go(`#/entry/${id}`);
+        if (!final) window.scrollTo(0, 0);
         break;
       }
       case "delete-draft": {

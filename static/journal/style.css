@@ -171,6 +171,9 @@ a.entry-card:hover{border-color:var(--accent);}
 .chip.done{background:var(--ok-soft);color:var(--ok);}
 .chip.draft{background:var(--surface-soft);color:var(--ink-soft);border:1px dashed var(--line);}
 .chip.fb{background:var(--accent-soft);color:var(--accent);}
+.chip.plan{background:var(--accent-soft);color:var(--accent);font-weight:700;}
+.locked-note{font-size:.85rem;color:var(--accent);margin:0 4px 10px;}
+.journal-hint{margin:-2px 4px 10px;}
 .chip.new{background:var(--new-soft);color:var(--new);font-weight:700;}
 .chip.on{background:var(--accent);color:var(--on-accent);}
 .chip.off{background:transparent;color:var(--ink-soft);border:1px solid var(--line);}

@@ -86,6 +86,13 @@ class SupabaseStore {
     if (error) throw error;
   }
 
+  async submitPlan(id) {
+    const { data, error } = await this.sb
+      .from("weekly_entries").update({ status: "plan_submitted" }).eq("id", id).select().single();
+    if (error) throw error;
+    return data;
+  }
+
   async submitEntry(id) {
     const { data, error } = await this.sb
       .from("weekly_entries").update({ status: "submitted" }).eq("id", id).select().single();
@@ -124,7 +131,7 @@ class SupabaseStore {
 
   async listAllEntries() {
     const { data, error } = await this.sb
-      .from("weekly_entries").select("id, client_id, week_no, period_start, status, submitted_at, updated_at")
+      .from("weekly_entries").select("id, client_id, week_no, period_start, status, plan_submitted_at, submitted_at, updated_at")
       .order("week_no", { ascending: false });
     if (error) throw error;
     return data;
@@ -218,7 +225,7 @@ class DemoStore {
     const now = new Date().toISOString();
     const e = {
       id: uid(), client_id: this.db.current, week_no, period_start, content,
-      status: "draft", submitted_at: null, created_at: now, updated_at: now,
+      status: "draft", plan_submitted_at: null, submitted_at: null, created_at: now, updated_at: now,
     };
     this.db.entries.push(e);
     this._save();
@@ -228,26 +235,42 @@ class DemoStore {
   _ownDraft(id) {
     const e = this.db.entries.find((x) => x.id === id);
     if (!e || e.client_id !== this.db.current) throw new Error("シートが見つかりません。");
-    if (e.status !== "draft") throw new Error("提出済みのシートは編集できません。");
+    if (e.status === "submitted") throw new Error("最終提出済みのシートは編集できません。");
     return e;
   }
 
   async saveEntry(id, { week_no, period_start, content }) {
     const e = this._ownDraft(id);
-    Object.assign(e, { week_no, period_start, content: clone(content), updated_at: new Date().toISOString() });
+    content = clone(content);
+    // Supabase 側のトリガーと同じく、プラン提出後は 01〜03 と週・期間を変えない
+    if (e.status === "plan_submitted") {
+      ({ week_no, period_start } = e);
+      for (const k of ["s01", "s02", "s03"]) content[k] = clone(e.content[k]);
+    }
+    Object.assign(e, { week_no, period_start, content, updated_at: new Date().toISOString() });
     this._save();
+  }
+
+  async submitPlan(id) {
+    const e = this._ownDraft(id);
+    if (e.status !== "draft") throw new Error("プランは提出済みです。");
+    e.status = "plan_submitted";
+    e.plan_submitted_at = e.updated_at = new Date().toISOString();
+    this._save();
+    return clone(e);
   }
 
   async submitEntry(id) {
     const e = this._ownDraft(id);
     e.status = "submitted";
     e.submitted_at = e.updated_at = new Date().toISOString();
+    if (!e.plan_submitted_at) e.plan_submitted_at = e.submitted_at;
     this._save();
     return clone(e);
   }
 
   async deleteEntry(id) {
-    this._ownDraft(id);
+    if (this._ownDraft(id).status !== "draft") throw new Error("プラン提出済みのシートは削除できません。");
     this.db.entries = this.db.entries.filter((e) => e.id !== id);
     this._save();
   }
@@ -323,7 +346,7 @@ function demoSeed() {
     members: [clone(DEMO_COACH), clone(DEMO_CLIENT)],
     entries: [{
       id: "demo-week1", client_id: DEMO_CLIENT.user_id, week_no: 1, period_start: "2026-10-05", content,
-      status: "submitted", submitted_at: "2026-10-11T21:00:00.000Z", created_at: "2026-10-05T09:00:00.000Z",
+      status: "submitted", plan_submitted_at: "2026-10-05T21:00:00.000Z", submitted_at: "2026-10-11T21:00:00.000Z", created_at: "2026-10-05T09:00:00.000Z",
       updated_at: "2026-10-11T21:00:00.000Z",
     }],
     feedback: [],
