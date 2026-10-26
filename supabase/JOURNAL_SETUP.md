@@ -1,6 +1,6 @@
 # 週次ジャーナル セットアップ手順
 
-アプリの場所：`https://<Render のURL>/journal/`
+アプリの場所：`https://soul-theme-api.onrender.com/journal/`
 接続先を空にすると「お試しモード」で動きます（データはその端末だけに保存）。
 
 ## 1. データベースを作る（Supabase）
@@ -11,8 +11,8 @@
 
 ## 2. ログインメールの設定（Supabase）
 - **Authentication → URL Configuration**
-  - Site URL：`https://<Render のURL>/journal/`
-  - Redirect URLs：`https://<Render のURL>/journal/**` を追加
+  - Site URL：`https://soul-theme-api.onrender.com/journal/`
+  - Redirect URLs：`https://soul-theme-api.onrender.com/journal/**` を追加
 - （SMTP 設定後）**Authentication → Emails → Magic link or OTP / Confirm sign up** テンプレートを日本語にし、確認コードを足す（スマホでリンクが別のブラウザで開いてしまう場合でも、コード入力でログインできるようにするため）。テンプレートの編集には独自 SMTP の設定が必要
   ```html
   <p>確認コード：<b>{{ .Token }}</b></p>
