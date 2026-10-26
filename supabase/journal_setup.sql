@@ -162,6 +162,8 @@ alter table public.feedback       enable row level security;
 revoke all on public.members, public.weekly_entries, public.feedback from anon;
 grant select, insert, update, delete on public.members, public.weekly_entries, public.feedback to authenticated;
 grant execute on function public.is_coach() to authenticated;
+-- サーバー（app/journal_api.py、Secret key）用。「新しいテーブルを自動的に公開」をオフにしたプロジェクトでは明示的に必要
+grant select, insert, update, delete on public.members, public.weekly_entries, public.feedback to service_role;
 -- 送信の記録（*_notified_at, reminder_sent_at）はサーバーだけが書く
 revoke insert, update on public.weekly_entries from authenticated;
 grant insert (week_no, period_start, content) on public.weekly_entries to authenticated;
