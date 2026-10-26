@@ -23,7 +23,9 @@ def test_journal_config_from_env(monkeypatch):
     r = client.get("/journal/config.json")
     assert r.json() == {"supabaseUrl": "https://example.supabase.co", "supabaseAnonKey": "sb_publishable_x"}
 
-def test_journal_config_empty_means_demo(monkeypatch):
+def test_journal_config_default(monkeypatch):
     monkeypatch.delenv("SUPABASE_URL", raising=False)
     monkeypatch.delenv("SUPABASE_ANON_KEY", raising=False)
-    assert client.get("/journal/config.json").json()["supabaseUrl"] == ""
+    cfg = client.get("/journal/config.json").json()
+    assert cfg["supabaseUrl"].endswith(".supabase.co")
+    assert cfg["supabaseAnonKey"].startswith("sb_publishable_")

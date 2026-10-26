@@ -1,7 +1,7 @@
 # 週次ジャーナル セットアップ手順
 
 アプリの場所：`https://<Render のURL>/journal/`
-Supabase の設定が無い間は「お試しモード」で動きます（データはその端末だけに保存）。
+接続先を空にすると「お試しモード」で動きます（データはその端末だけに保存）。
 
 ## 1. データベースを作る（Supabase）
 1. Supabase ダッシュボード → 左メニュー **SQL Editor** → **New query**
@@ -18,8 +18,9 @@ Supabase の設定が無い間は「お試しモード」で動きます（デ�
   <p>確認コード：<b>{{ .Token }}</b></p>
   ```
 
-## 3. アプリに接続先を教える（Render）
-Render → soul-theme-api → **Environment** に追加して保存（自動で再起動されます）
+## 3. アプリの接続先
+接続先（Project URL と Publishable key）は `app/main.py` に組み込み済み。
+別の Supabase プロジェクトに切り替えるときだけ、Render → soul-theme-api → **Environment** に追加する
 - `SUPABASE_URL` = `https://xxxx.supabase.co`
 - `SUPABASE_ANON_KEY` = Publishable key（`sb_publishable_...`）または anon key
 

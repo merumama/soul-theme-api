@@ -150,7 +150,11 @@ def palm_reading_tool():
 def finger_dictionary_tool():
     return FileResponse(STATIC_DIR / "finger_dictionary.html")
 
-# 週次ジャーナル（static/journal）。Supabase の接続先は環境変数で渡す
+# 週次ジャーナル（static/journal）。Supabase の接続先（公開用キーなので埋め込んでよい）。
+# 環境変数 SUPABASE_URL / SUPABASE_ANON_KEY があればそちらを優先する
+JOURNAL_SUPABASE_URL = "https://foydbpxdrjkogxezgsax.supabase.co"
+JOURNAL_SUPABASE_KEY = "sb_publishable_Wh1Dx9P76saUyewrx34Otw_3VIgCDXy"
+
 @app.get("/journal", include_in_schema=False)
 def journal_redirect():
     return RedirectResponse("/journal/")
@@ -158,8 +162,8 @@ def journal_redirect():
 @app.get("/journal/config.json", include_in_schema=False)
 def journal_config():
     return {
-        "supabaseUrl": os.environ.get("SUPABASE_URL", ""),
-        "supabaseAnonKey": os.environ.get("SUPABASE_ANON_KEY", ""),
+        "supabaseUrl": os.environ.get("SUPABASE_URL", JOURNAL_SUPABASE_URL),
+        "supabaseAnonKey": os.environ.get("SUPABASE_ANON_KEY", JOURNAL_SUPABASE_KEY),
     }
 
 @app.post("/diagnose", response_model=DiagnoseOut)
