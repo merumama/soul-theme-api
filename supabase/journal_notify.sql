@@ -9,6 +9,9 @@ alter table public.weekly_entries
   add column if not exists final_notified_at timestamptz,
   add column if not exists reminder_sent_at  timestamptz;
 
+-- サーバー（app/journal_api.py、Secret key）用。「新しいテーブルを自動的に公開」をオフにしたプロジェクトでは明示的に必要
+grant select, insert, update, delete on public.members, public.weekly_entries, public.feedback to service_role;
+
 -- クライアントが書き込める列を絞る（送信の記録はサーバーだけが書く）
 revoke insert, update on public.weekly_entries from authenticated;
 grant insert (week_no, period_start, content) on public.weekly_entries to authenticated;

@@ -250,6 +250,9 @@ a.entry-card:hover{border-color:var(--accent);}
 
 .actions{display:flex;flex-direction:column;gap:10px;margin-top:20px;}
 .actions p{margin:0;}
+.usage{margin-top:24px;}
+.usage summary{cursor:pointer;font-weight:700;color:var(--accent);}
+.usage .pre{margin-top:10px;line-height:1.8;}
 .invite{white-space:pre-wrap;font-family:inherit;font-size:.85rem;background:var(--surface-soft);border:1px solid var(--line);border-radius:10px;padding:12px;margin:8px 0 12px;}
 .danger-zone{text-align:center;margin:10px 0 20px;font-size:.85rem;}
 
