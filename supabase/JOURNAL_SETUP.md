@@ -13,7 +13,7 @@
 - **Authentication → URL Configuration**
   - Site URL：`https://<Render のURL>/journal/`
   - Redirect URLs：`https://<Render のURL>/journal/**` を追加
-- **Authentication → Emails → Magic Link** テンプレートの本文に、確認コードを足す（スマホでリンクが別のブラウザで開いてしまう場合でも、コード入力でログインできるようにするため）
+- （SMTP 設定後）**Authentication → Emails → Magic link or OTP / Confirm sign up** テンプレートを日本語にし、確認コードを足す（スマホでリンクが別のブラウザで開いてしまう場合でも、コード入力でログインできるようにするため）。テンプレートの編集には独自 SMTP の設定が必要
   ```html
   <p>確認コード：<b>{{ .Token }}</b></p>
   ```

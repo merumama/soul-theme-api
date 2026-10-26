@@ -261,8 +261,8 @@ function renderLogin() {
         <button class="btn primary" type="submit">ログイン用メールを送る</button>
       </form>
       <form id="code-form" class="stack" hidden>
-        <p>メールを送りました。<br>メール内の<b>リンクを押す</b>か、メールに書かれた<b>確認コード</b>を入力してください。</p>
-        <label class="field"><span>確認コード</span>
+        <p>メールを送りました。<br>メール内の<b>リンクを押して</b>ログインしてください。</p>
+        <label class="field"><span>メールに確認コードが書かれている場合は、ここに入力してもログインできます</span>
           <input name="code" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6,10}" placeholder="123456"></label>
         <button class="btn primary" type="submit">ログイン</button>
         <button class="link" type="button" data-act="login-back">メールアドレスを入れ直す</button>
