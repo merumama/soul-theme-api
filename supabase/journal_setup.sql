@@ -26,6 +26,9 @@ create table if not exists public.weekly_entries (
   status       text not null default 'draft',
   plan_submitted_at timestamptz,
   submitted_at timestamptz,
+  plan_notified_at  timestamptz,
+  final_notified_at timestamptz,
+  reminder_sent_at  timestamptz,
   created_at   timestamptz not null default now(),
   updated_at   timestamptz not null default now()
 );
@@ -159,6 +162,10 @@ alter table public.feedback       enable row level security;
 revoke all on public.members, public.weekly_entries, public.feedback from anon;
 grant select, insert, update, delete on public.members, public.weekly_entries, public.feedback to authenticated;
 grant execute on function public.is_coach() to authenticated;
+-- 送信の記録（*_notified_at, reminder_sent_at）はサーバーだけが書く
+revoke insert, update on public.weekly_entries from authenticated;
+grant insert (week_no, period_start, content) on public.weekly_entries to authenticated;
+grant update (week_no, period_start, content, status) on public.weekly_entries to authenticated;
 
 -- members：本人は自分の行だけ見られる。コーチは全員を見て、追加・編集できる
 drop policy if exists members_select on public.members;
@@ -200,6 +207,8 @@ create policy feedback_coach_write on public.feedback for all to authenticated
     public.is_coach()
     and exists (select 1 from public.weekly_entries e where e.id = entry_id and e.status = 'submitted')
   );
+
+-- ※ 招待・お知らせ・リマインドのメールを使うときは、journal_notify.sql も実行する（毎朝のリマインド予約）
 
 -- ---------- コーチ登録 ----------
 -- ↓ 'coach@example.com' をご自分のメールアドレスに書き換えてから実行してください

@@ -7,8 +7,12 @@ from typing import Dict, Any, List
 from datetime import datetime
 from pathlib import Path
 import json
-import os
 import re
+
+try:
+    from .journal_api import router as journal_router, supabase_url, supabase_anon_key
+except ImportError:  # tests import this file as a top-level module
+    from journal_api import router as journal_router, supabase_url, supabase_anon_key
 
 # ==========
 # App
@@ -150,10 +154,7 @@ def palm_reading_tool():
 def finger_dictionary_tool():
     return FileResponse(STATIC_DIR / "finger_dictionary.html")
 
-# 週次ジャーナル（static/journal）。Supabase の接続先（公開用キーなので埋め込んでよい）。
-# 環境変数 SUPABASE_URL / SUPABASE_ANON_KEY があればそちらを優先する
-JOURNAL_SUPABASE_URL = "https://foydbpxdrjkogxezgsax.supabase.co"
-JOURNAL_SUPABASE_KEY = "sb_publishable_Wh1Dx9P76saUyewrx34Otw_3VIgCDXy"
+# 週次ダイエットプラン（static/journal）。Supabase の接続先は app/journal_api.py を参照
 
 @app.get("/journal", include_in_schema=False)
 def journal_redirect():
@@ -162,8 +163,8 @@ def journal_redirect():
 @app.get("/journal/config.json", include_in_schema=False)
 def journal_config():
     return {
-        "supabaseUrl": os.environ.get("SUPABASE_URL", JOURNAL_SUPABASE_URL),
-        "supabaseAnonKey": os.environ.get("SUPABASE_ANON_KEY", JOURNAL_SUPABASE_KEY),
+        "supabaseUrl": supabase_url(),
+        "supabaseAnonKey": supabase_anon_key(),
     }
 
 @app.post("/diagnose", response_model=DiagnoseOut)
@@ -199,5 +200,7 @@ def diagnose(payload: DiagnoseIn):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Internal error: {e}")
 
-# 他のルートより後にマウントすること（/journal/config.json を優先させるため）
+app.include_router(journal_router)
+
+# 他のルートより後にマウントすること（/journal/config.json と /journal/api を優先させるため）
 app.mount("/journal", StaticFiles(directory=STATIC_DIR / "journal", html=True), name="journal")
