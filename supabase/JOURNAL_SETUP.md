@@ -13,10 +13,12 @@
 - **Authentication → URL Configuration**
   - Site URL：`https://soul-theme-api.onrender.com/journal/`
   - Redirect URLs：`https://soul-theme-api.onrender.com/journal/**` を追加
-- （SMTP 設定後）**Authentication → Emails → Magic link or OTP / Confirm sign up** テンプレートを日本語にし、確認コードを足す（スマホでリンクが別のブラウザで開いてしまう場合でも、コード入力でログインできるようにするため）。テンプレートの編集には独自 SMTP の設定が必要
-  ```html
-  <p>確認コード：<b>{{ .Token }}</b></p>
-  ```
+- **Authentication → Emails → SMTP Settings**（Resend）
+  - Host `smtp.resend.com` / Port `465` / Username `resend` / Password = Resend の API キー
+  - Sender `noreply@be-quem.com`（Resend で be-quem.com を Verified にしておく。DNS はエックスサーバーで設定済み）
+- **Authentication → Emails → Templates**：「Magic link or OTP」と「Confirm sign up」を日本語にする
+  - 件名：`【ソウルダイエット】週次ダイエットプランログインのご案内`
+  - 本文に `{{ .ConfirmationURL }}`（ログインボタン）と `{{ .Token }}`（確認コード）を入れる
 
 ## 3. アプリの接続先
 接続先（Project URL と Publishable key）は `app/main.py` に組み込み済み。

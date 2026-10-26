@@ -263,9 +263,9 @@ function renderLogin() {
         <button class="btn primary" type="submit">ログイン用メールを送る</button>
       </form>
       <form id="code-form" class="stack" hidden>
-        <p>メールを送りました。<br>届いたメール（英語の件名「Confirm your email address」または「Your Magic Link」）の中の<b>リンクを押して</b>ログインしてください。</p>
+        <p>メールを送りました。<br>件名「【ソウルダイエット】週次ダイエットプランログインのご案内」のメールの<b>「ログインする」ボタン</b>を押してください。</p>
         <p class="small muted">届かないときは、迷惑メールフォルダも確認してください。</p>
-        <label class="field"><span>メールに確認コードが書かれている場合は、ここに入力してもログインできます</span>
+        <label class="field"><span>ボタンが押せないときは、メールに書かれた確認コードを入力してください</span>
           <input name="code" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6,10}" placeholder="123456"></label>
         <button class="btn primary" type="submit">ログイン</button>
         <button class="link" type="button" data-act="login-back">メールアドレスを入れ直す</button>
@@ -860,7 +860,7 @@ function inviteText(url, member) {
     "",
     "▼はじめての方",
     "1. 上のURLを開き、「ログイン用メールを送る」を押す",
-    "2. 英語のメール（件名「Confirm your email address」）が届くので、中のリンクを押す",
+    "2. 届いたメール（件名「【ソウルダイエット】週次ダイエットプランログインのご案内」）の「ログインする」ボタンを押す",
     "3. 「第1週をはじめる」から記入できます",
     "",
     "▼2回目から",
