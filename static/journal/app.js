@@ -1,7 +1,7 @@
 import { createStore } from "./store.js";
 
 // =====================================================================
-// シートの構成（PDF「STEP3 1週間アクションプラン＆ジャーナル」に対応）
+// シートの構成（PDF「STEP3 ソウルダイエット 1週間アクションプラン＆フィードバック」に対応）
 // =====================================================================
 const SECTIONS = {
   s01: { no: "01", title: "私の望む方向", sub: "3か月〜半年後、どんな自分でいたい？（体重だけでなく、暮らし方・気持ちも）" },
@@ -225,7 +225,7 @@ function renderTop() {
   const demo = store.mode === "demo";
   $top.innerHTML = `
     <div class="top-inner">
-      <a class="brand" href="#/"><span class="brand-mark">Soul Diet</span><span class="brand-name">週次ジャーナル</span></a>
+      <a class="brand" href="#/"><span class="brand-mark">Soul Diet</span><span class="brand-name">週次ダイエットプラン</span></a>
       ${me ? `<div class="who"><span class="who-name">${esc(me.display_name || me.email)}${me.role === "coach" ? '<span class="tag">コーチ</span>' : ""}</span><button class="link" data-act="logout">ログアウト</button></div>` : ""}
     </div>
     ${demo ? `<div class="demo-bar">お試しモード：データはこの端末だけに保存されます${me ? ` ・ <button class="link" data-act="demo-switch">${me.role === "coach" ? "クライアント画面に切り替え" : "コーチ画面に切り替え"}</button>` : ""}</div>` : ""}`;
@@ -238,7 +238,7 @@ function renderLogin() {
   if (store.mode === "demo") {
     $app.innerHTML = `
       <section class="card pad login">
-        <h1>ソウルダイエット<br>週次ジャーナル</h1>
+        <h1>ソウルダイエット<br>週次ダイエットプラン</h1>
         <p class="lead">「守れたか」よりも、「自分に合う方法が見つかったか」。<br>試して、気づいて、選び直そう。</p>
         <p class="muted">お試しモードです。どちらの立場で使ってみますか？</p>
         <div class="stack">
@@ -251,9 +251,11 @@ function renderLogin() {
   }
   let saved = "";
   try { saved = localStorage.getItem("soul-journal-email") || ""; } catch (e) { /* noop */ }
+  const fromLink = new URLSearchParams(location.search).get("email");
+  if (fromLink) saved = fromLink;
   $app.innerHTML = `
     <section class="card pad login">
-      <h1>ソウルダイエット<br>週次ジャーナル</h1>
+      <h1>ソウルダイエット<br>週次ダイエットプラン</h1>
       <p class="lead">「守れたか」よりも、「自分に合う方法が見つかったか」。<br>試して、気づいて、選び直そう。</p>
       <form id="login-form" class="stack">
         <label class="field"><span>メールアドレス</span>
@@ -261,7 +263,8 @@ function renderLogin() {
         <button class="btn primary" type="submit">ログイン用メールを送る</button>
       </form>
       <form id="code-form" class="stack" hidden>
-        <p>メールを送りました。<br>メール内の<b>リンクを押して</b>ログインしてください。</p>
+        <p>メールを送りました。<br>届いたメール（英語の件名「Confirm your email address」または「Your Magic Link」）の中の<b>リンクを押して</b>ログインしてください。</p>
+        <p class="small muted">届かないときは、迷惑メールフォルダも確認してください。</p>
         <label class="field"><span>メールに確認コードが書かれている場合は、ここに入力してもログインできます</span>
           <input name="code" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6,10}" placeholder="123456"></label>
         <button class="btn primary" type="submit">ログイン</button>
@@ -524,7 +527,7 @@ function drawEditor(prev) {
   const scrollY = window.scrollY;
   $app.innerHTML = `
     <a class="back" href="#/">← 一覧へ</a>
-    <div class="sheet-title">1週間アクションプラン ＆ ジャーナル</div>
+    <div class="sheet-title">ソウルダイエット｜1週間アクションプラン ＆ フィードバック</div>
     ${sheetHead(entry, me.display_name, true)}
     ${reminder}
     <div class="part-label">アクションプラン</div>
@@ -703,7 +706,7 @@ function renderView(entry, feedback, siblings, clientName, isOwner) {
   const overall = fbOf("overall");
   $app.innerHTML = `
     <a class="back" href="${coach ? `#/client/${esc(entry.client_id)}` : "#/"}">← 一覧へ</a>
-    <div class="sheet-title">1週間アクションプラン ＆ ジャーナル</div>
+    <div class="sheet-title">ソウルダイエット｜1週間アクションプラン ＆ フィードバック</div>
     ${sheetHead(entry, clientName, false)}
     <div class="submitted-note">提出済み ${esc(stamp(entry.submitted_at))}${coach ? "" : "（提出後は編集できません）"}</div>
     ${!coach && overall ? `<section class="card pad fb-overall"><div class="fb-label">コーチからのフィードバック</div><p class="pre">${nl(overall.body)}</p></section>` : ""}
@@ -722,7 +725,7 @@ function entryAsText(entry, name) {
   const c = normalize(entry.content);
   const L = [];
   const t = (s) => (blank(s) ? "（未記入）" : s.trim());
-  L.push(`ソウルダイエット｜1週間アクションプラン＆ジャーナル`);
+  L.push(`ソウルダイエット｜1週間アクションプラン＆フィードバック`);
   L.push(`第${entry.week_no}週　${periodText(entry.period_start)}　名前：${name}`);
   L.push("");
   L.push(`■01 ${SECTIONS.s01.title}`, t(c.s01.direction), "");
@@ -804,6 +807,7 @@ async function renderCoachHome() {
   }).sort((a, b) => a.rank - b.rank);
 
   const url = location.origin + location.pathname;
+  const inviteTo = clients.find((m) => m.email === inviteFor) || clients[clients.length - 1];
   $app.innerHTML = `
     <h1 class="page-title">クライアント</h1>
     ${rows.length ? `<div class="list">${rows.map((r) => r.html).join("")}</div>` : `<p class="muted pad">まだクライアントが登録されていません。下のフォームから追加してください。</p>`}
@@ -818,17 +822,25 @@ async function renderCoachHome() {
     </section>
     <section class="card pad">
       <h2>クライアントさんへの案内文</h2>
-      <p class="small muted">コピーして LINE やメールで送れます。</p>
-      <pre class="invite" id="invite">${esc(inviteText(url))}</pre>
+      <p class="small muted">コピーして LINE やメールで送れます。URL にメールアドレスが入っているので、クライアントさんは入力しなくて済みます。</p>
+      ${clients.length ? `<label class="field"><span>送る相手</span><select id="invite-to">${clients.map((m) => `<option value="${esc(m.email)}" ${inviteTo && m.email === inviteTo.email ? "selected" : ""}>${esc(m.display_name || m.email)}</option>`).join("")}</select></label>` : ""}
+      <pre class="invite" id="invite">${esc(inviteText(url, inviteTo))}</pre>
       <button class="btn" data-act="copy-invite">案内文をコピー</button>
     </section>`;
+
+  const sel = document.getElementById("invite-to");
+  if (sel) sel.addEventListener("change", () => {
+    inviteFor = sel.value;
+    document.getElementById("invite").textContent = inviteText(url, clients.find((m) => m.email === sel.value));
+  });
 
   document.getElementById("add-member").addEventListener("submit", async (e) => {
     e.preventDefault();
     const f = e.target;
     try {
       await store.addMember(f.email.value, f.name.value.trim());
-      toast("追加しました");
+      inviteFor = f.email.value.trim().toLowerCase();
+      toast("追加しました。下の案内文を送ってください");
       render();
     } catch (err) {
       toast(err.message);
@@ -836,15 +848,19 @@ async function renderCoachHome() {
   });
 }
 
-function inviteText(url) {
+let inviteFor = null;    // 案内文の宛先（クライアントのメールアドレス）
+
+function inviteText(url, member) {
+  const link = member ? `${url}?email=${encodeURIComponent(member.email)}` : url;
   return [
-    "【ソウルダイエット 週次ジャーナルのご案内】",
+    member && member.display_name ? `${member.display_name}さん` : "",
+    "【ソウルダイエット 週次ダイエットプランのご案内】",
     "毎週のアクションプランと振り返りは、こちらから記入・提出してください。",
-    url,
+    link,
     "",
     "▼はじめての方",
-    "1. 上のURLを開き、登録したメールアドレスを入力",
-    "2. 届いたメールのリンクを押す（またはメールの確認コードを入力）",
+    "1. 上のURLを開き、「ログイン用メールを送る」を押す",
+    "2. 英語のメール（件名「Confirm your email address」）が届くので、中のリンクを押す",
     "3. 「第1週をはじめる」から記入できます",
     "",
     "▼2回目から",
@@ -852,7 +868,7 @@ function inviteText(url) {
     "ホーム画面に追加しておくと便利です。",
     "",
     "入力は自動で保存されます。書き終えたら「提出する」を押してください。",
-  ].join("\n");
+  ].filter((line, i) => i > 0 || line).join("\n");
 }
 
 async function renderCoachClient(userId) {
