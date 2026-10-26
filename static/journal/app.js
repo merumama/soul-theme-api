@@ -829,7 +829,7 @@ async function renderCoachHome() {
       rank,
       html: m.user_id
         ? `<a class="entry-card" href="#/client/${esc(m.user_id)}"><div class="entry-card-main"><div class="entry-week">${esc(m.display_name || m.email)}</div><div class="small muted">${esc(m.email)}</div>${last}</div><div class="entry-card-side">${status}</div></a>`
-        : `<div class="entry-card disabled"><div class="entry-card-main"><div class="entry-week">${esc(m.display_name || m.email)}</div><div class="small muted">${esc(m.email)}</div></div><div class="entry-card-side">${status}</div></div>`,
+        : `<div class="entry-card disabled"><div class="entry-card-main"><div class="entry-week">${esc(m.display_name || m.email)}</div><div class="small muted">${esc(m.email)}</div></div><div class="entry-card-side">${status}<button class="btn small-btn" data-act="invite" data-email="${esc(m.email)}">招待メールを送る</button></div></div>`,
     };
   }).sort((a, b) => a.rank - b.rank);
 
@@ -845,11 +845,11 @@ async function renderCoachHome() {
         <label class="field"><span>メールアドレス</span><input name="email" type="email" required inputmode="email" placeholder="client@example.com"></label>
         <button class="btn primary" type="submit">追加する</button>
       </form>
-      <p class="small muted">登録したメールアドレスだけがログインできます。</p>
+      <p class="small muted">追加すると、クライアントさんに招待メールが届きます。登録したメールアドレスだけがログインできます。</p>
     </section>
     <section class="card pad">
       <h2>クライアントさんへの案内文</h2>
-      <p class="small muted">コピーして LINE やメールで送れます。URL にメールアドレスが入っているので、クライアントさんは入力しなくて済みます。</p>
+      <p class="small muted">招待メールが届かないときや、LINE でも案内したいときに使えます。URL にメールアドレスが入っているので、クライアントさんは入力しなくて済みます。</p>
       ${clients.length ? `<label class="field"><span>送る相手</span><select id="invite-to">${clients.map((m) => `<option value="${esc(m.email)}" ${inviteTo && m.email === inviteTo.email ? "selected" : ""}>${esc(m.display_name || m.email)}</option>`).join("")}</select></label>` : ""}
       <pre class="invite" id="invite">${esc(inviteText(url, inviteTo))}</pre>
       <button class="btn" data-act="copy-invite">案内文をコピー</button>
@@ -865,9 +865,11 @@ async function renderCoachHome() {
     e.preventDefault();
     const f = e.target;
     try {
-      await store.addMember(f.email.value, f.name.value.trim());
-      inviteFor = f.email.value.trim().toLowerCase();
-      toast("追加しました。下の案内文を送ってください");
+      const email = f.email.value.trim().toLowerCase();
+      await store.addMember(email, f.name.value.trim());
+      inviteFor = email;
+      f.querySelector("button").disabled = true;
+      toast(await sendInvite(email, "追加しました。"));
       render();
     } catch (err) {
       toast(err.message);
@@ -876,6 +878,17 @@ async function renderCoachHome() {
 }
 
 let inviteFor = null;    // 案内文の宛先（クライアントのメールアドレス）
+
+// 招待メールを送り、結果をトーストの文にして返す（送れなくても案内文で代わりにできる）
+async function sendInvite(email, prefix = "") {
+  try {
+    const res = await store.inviteMember(email);
+    if (res.sent === "demo") return `${prefix}お試しモードでは招待メールは送られません。`;
+    return `${prefix}${res.sent === "login" ? "ログイン用メール" : "招待メール"}を送りました。`;
+  } catch (err) {
+    return `${prefix}招待メールは送れませんでした（${err.message}）。下の案内文を送ってください。`;
+  }
+}
 
 function inviteText(url, member) {
   const link = member ? `${url}?email=${encodeURIComponent(member.email)}` : url;
@@ -990,6 +1003,7 @@ async function onClick(e) {
         editing = null;
         if (final) await store.submitEntry(id);
         else await store.submitPlan(id);
+        store.notifySubmitted(id, final ? "final" : "plan");
         toast(final ? "最終提出しました。おつかれさまでした！" : "プランを提出しました。1週間の記録をつけていきましょう");
         go(`#/entry/${id}`);
         if (!final) window.scrollTo(0, 0);
@@ -1026,6 +1040,11 @@ async function onClick(e) {
         toast((await copyText(entryAsText(entry, name))) ? "コピーしました" : "コピーできませんでした");
         break;
       }
+      case "invite":
+        el.disabled = true;
+        toast(await sendInvite(el.dataset.email));
+        el.disabled = false;
+        break;
       case "copy-invite":
         toast((await copyText(document.getElementById("invite").textContent)) ? "コピーしました" : "コピーできませんでした");
         break;

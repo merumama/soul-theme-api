@@ -149,6 +149,30 @@ class SupabaseStore {
     const { error } = await this.sb.from("members").update({ display_name: displayName }).eq("email", email);
     if (error) throw error;
   }
+
+  // メール送信（サーバー側 app/journal_api.py）
+  async _api(path, body, { keepalive = false } = {}) {
+    const { data } = await this.sb.auth.getSession();
+    const token = data.session ? data.session.access_token : "";
+    const res = await fetch(path, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+      body: JSON.stringify(body),
+      keepalive,
+    });
+    const json = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(json.detail || "メールを送れませんでした。");
+    return json;
+  }
+
+  async inviteMember(email) {
+    return this._api("api/invite", { email });
+  }
+
+  // 提出のお知らせは失敗しても提出そのものには影響させない
+  notifySubmitted(entryId, kind) {
+    this._api("api/notify", { entry_id: entryId, kind }, { keepalive: true }).catch((e) => console.warn(e));
+  }
 }
 
 function friendlyAuthError(error) {
@@ -308,6 +332,12 @@ class DemoStore {
     if (m) m.display_name = displayName;
     this._save();
   }
+
+  async inviteMember() {
+    return { sent: "demo" };
+  }
+
+  notifySubmitted() {}
 }
 
 function demoSeed() {

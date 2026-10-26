@@ -163,7 +163,8 @@ input::placeholder,textarea::placeholder{color:var(--ink-soft);opacity:.55;}
   color:var(--ink);text-decoration:none;box-shadow:var(--shadow);
 }
 a.entry-card:hover{border-color:var(--accent);}
-.entry-card.disabled{opacity:.75;box-shadow:none;}
+.entry-card.disabled{box-shadow:none;}
+.entry-card.disabled .entry-card-main{opacity:.75;}
 .entry-week{font-weight:700;font-size:1.05rem;}
 .entry-card-side{display:flex;flex-wrap:wrap;gap:6px;justify-content:flex-end;}
 .chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;}

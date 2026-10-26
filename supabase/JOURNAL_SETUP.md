@@ -1,4 +1,4 @@
-# 週次ジャーナル セットアップ手順
+# 週次ダイエットプラン セットアップ手順
 
 アプリの場所：`https://soul-theme-api.onrender.com/journal/`
 接続先を空にすると「お試しモード」で動きます（データはその端末だけに保存）。
@@ -16,7 +16,7 @@
 - **Authentication → Emails → SMTP Settings**（Resend）
   - Host `smtp.resend.com` / Port `465` / Username `resend` / Password = Resend の API キー
   - Sender `noreply@be-quem.com`（Resend で be-quem.com を Verified にしておく。DNS はエックスサーバーで設定済み）
-- **Authentication → Emails → Templates**：「Magic link or OTP」と「Confirm sign up」を日本語にする
+- **Authentication → Emails → Templates**：「Magic link or OTP」「Confirm sign up」「Invite user」を日本語にする
   - 件名：`【ソウルダイエット】週次ダイエットプランログインのご案内`
   - 本文に `{{ .ConfirmationURL }}`（ログインボタン）と `{{ .Token }}`（確認コード）を入れる
 
@@ -31,9 +31,22 @@
 ## 4. 使い始める
 1. コーチが `/journal/` を開き、自分のメールアドレスでログイン
 2. 「クライアントを追加」で名前とメールアドレスを登録
-3. 「案内文をコピー」してクライアントに送る
+3. 追加すると招待メールが届く（届かないときは「招待メールを送る」ボタンか、案内文をコピーして送る）
 
 ## 本番運用で検討すること
 - Supabase 標準のメール送信は1時間あたりの上限が小さいので、人数が増えたら
   **Authentication → Emails → SMTP Settings** で Resend などをつなぐ
 - Render 無料プランは初回表示が遅いことがある（有料プランで解消）
+
+## 5. 招待・提出のお知らせ・リマインドのメール
+サーバー（`app/journal_api.py`）から送る。
+- 招待：コーチがクライアントを追加したとき（Supabase の「Invite user」テンプレート）
+- 提出のお知らせ：プラン提出・最終提出のたびに、コーチ全員へ（Resend から直接）
+- リマインド：週の最終日（開始日 + 6日）の朝9時に、まだ最終提出していない人へ（Resend から直接）
+
+設定すること
+1. SQL Editor で `supabase/journal_notify.sql` を実行する（送信記録の列と、毎朝9時の pg_cron 予約）
+2. Render → soul-theme-api → **Environment** に追加する（チャットやコードには書かないこと）
+   - `SUPABASE_SECRET_KEY`：Supabase → Project Settings → API Keys → Secret key（`sb_secret_...`）
+   - `RESEND_API_KEY`：Resend → API Keys で作ったキー（`re_...`、Sending access）
+
