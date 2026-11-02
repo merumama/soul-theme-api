@@ -1,0 +1,11 @@
+{
+  "name": "kokoro-hint",
+  "private": true,
+  "type": "module",
+  "description": "SOUL DIET 今日のココロのヒント",
+  "engines": { "node": ">=18" },
+  "scripts": {
+    "test": "node --test test/*.test.mjs",
+    "dev": "node scripts/dev-server.mjs"
+  }
+}

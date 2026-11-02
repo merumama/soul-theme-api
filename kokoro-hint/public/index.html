@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>今日のココロのヒント | SOUL DIET</title>
+  <meta name="description" content="毎日ひとつ、心に届く短いメッセージ。">
+  <meta name="theme-color" content="#f7f2ea">
+  <meta name="robots" content="noindex">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500&family=Shippori+Mincho:wght@500&family=Zen+Kaku+Gothic+New:wght@400&display=swap">
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <main class="page">
+    <header class="head">
+      <p class="brand">SOUL DIET</p>
+      <h1 class="title">今日のココロのヒント</h1>
+      <p class="date" id="date" aria-live="polite"></p>
+    </header>
+
+    <section class="card" aria-live="polite">
+      <span class="rule" aria-hidden="true"></span>
+
+      <div class="state state--loading" id="loading">
+        <span class="dots" aria-hidden="true"><i></i><i></i><i></i></span>
+        <span class="sr-only">読み込み中</span>
+      </div>
+
+      <blockquote class="message" id="message" hidden></blockquote>
+
+      <div class="state state--error" id="error" hidden>
+        <p>ただいま、今日のメッセージを<br>読み込めませんでした。</p>
+        <p class="error-sub">少し時間をおいて、もう一度お試しください。</p>
+        <button type="button" class="retry" id="retry">もう一度読み込む</button>
+      </div>
+
+      <span class="rule" aria-hidden="true"></span>
+    </section>
+
+    <footer class="foot" id="foot">
+      <p>また明日、新しい言葉をお届けします。</p>
+    </footer>
+  </main>
+
+  <script src="/app.js" defer></script>
+</body>
+</html>
