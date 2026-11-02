@@ -25,7 +25,7 @@ test('今日のメッセージだけを返し、テーマや番号・トーク�
   const res = await call('2026-11-02T03:00:00Z');
   assert.equal(res.status, 200);
   const body = await res.json();
-  assert.deepEqual(Object.keys(body).sort(), ['date', 'message', 'ok']);
+  assert.deepEqual(Object.keys(body).sort(), ['date', 'message', 'ok', 'phrases']);
   assert.equal(body.date, '2026-11-02');
   assert.match(calledUrl, /token=secret-token/);
   assert.ok(!JSON.stringify(body).includes('secret-token'));
@@ -70,4 +70,11 @@ test('環境変数が不足していれば 500', async () => {
   setup(okResponse(sampleMessages()), { GAS_TOKEN: '' });
   const res = await call('2026-11-02T03:00:00Z');
   assert.equal(res.status, 500);
+});
+
+test('文節（phrases）をつなげると本文と一致する', async () => {
+  setup(okResponse(sampleMessages()));
+  const body = await (await call('2026-11-02T03:00:00Z')).json();
+  assert.ok(Array.isArray(body.phrases) && body.phrases.length > 1);
+  assert.equal(body.phrases.join(''), body.message);
 });

@@ -43,7 +43,23 @@
   function render(data) {
     var text = String(data.message).trim(); // シートの文章をそのまま表示
     els.message.className = 'message ' + lengthClass(text);
-    els.message.textContent = text;
+    els.message.textContent = '';
+    var phrases = Array.isArray(data.phrases) && data.phrases.join('') === text ? data.phrases : null;
+    if (phrases) {
+      // 文節ごとに「途中で割らない箱」に入れ、文節の切れ目でだけ改行する
+      phrases.forEach(function (p) {
+        if (p === '\n') {
+          els.message.appendChild(document.createElement('br'));
+          return;
+        }
+        var span = document.createElement('span');
+        span.className = 'ph';
+        span.textContent = p;
+        els.message.appendChild(span);
+      });
+    } else {
+      els.message.textContent = text;
+    }
     els.date.textContent = formatDate(data.date);
     shownDate = data.date;
     show('message');

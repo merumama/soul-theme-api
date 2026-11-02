@@ -41,9 +41,9 @@ body {
   display: flex;
   flex-direction: column;
   padding:
-    calc(48px + env(safe-area-inset-top))
+    calc(clamp(28px, 6vh, 56px) + env(safe-area-inset-top))
     calc(28px + env(safe-area-inset-right))
-    calc(32px + env(safe-area-inset-bottom))
+    calc(clamp(20px, 4vh, 32px) + env(safe-area-inset-bottom))
     calc(28px + env(safe-area-inset-left));
 }
 
@@ -84,8 +84,8 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: clamp(40px, 9vh, 72px);
-  padding: clamp(48px, 10vh, 96px) 0;
+  gap: clamp(28px, 7vh, 72px);
+  padding: clamp(28px, 7vh, 96px) 0;
   text-align: center;
 }
 
@@ -102,15 +102,17 @@ body {
   max-width: 100%;
   font-family: var(--font-serif);
   font-weight: 500;
-  font-size: clamp(1.3rem, 5.6vw, 1.75rem);
+  font-size: clamp(1.15rem, 5.6vw, 1.75rem);
   line-height: 2;
   letter-spacing: 0.06em;
   white-space: pre-line;          /* セル内の改行をそのまま反映 */
   overflow-wrap: anywhere;
-  word-break: auto-phrase;        /* 対応ブラウザでは文節で改行 */
   text-wrap: pretty;
   animation: fade 0.8s ease-out both;
 }
+
+/* 文節（.ph）の途中では改行しない。1行に収まらない長い文節だけ、その中で折り返す */
+.message .ph { display: inline-block; max-width: 100%; }
 
 /* 長めのメッセージ：少し小さく、左揃えで読みやすく */
 .message.is-long {

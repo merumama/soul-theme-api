@@ -21,6 +21,7 @@ Googleスプレッドシート「メッセージ一覧」
 | `public/` | 画面（HTML / CSS / JavaScript）。フレームワークなし |
 | `netlify/functions/today.mjs` | GASからデータを取り、今日の1件だけを返す |
 | `lib/selector.mjs` | 日替わりの選択ロジック |
+| `lib/phrases.mjs` | 文章を文節に区切る（[BudouX](https://github.com/google/budoux)）。iPhoneでも単語の途中で改行されないようにするため |
 | `gas/Code.gs` | スプレッドシートを読むGAS（合言葉が一致したときだけ応答） |
 | `test/` | 自動テスト（`npm test`） |
 | `scripts/` | ローカル確認用サーバー、表示順の一覧表示 |
@@ -96,6 +97,7 @@ node scripts/preview-schedule.mjs 2026-11-01
 
 ```bash
 cd kokoro-hint
+npm install                      # 初回のみ（BudouX を取得。Netlify では自動）
 npm test                         # 自動テスト
 node scripts/dev-server.mjs      # http://localhost:8888 でダミーデータ表示
 MOCK=long  node scripts/dev-server.mjs   # 長文の表示確認

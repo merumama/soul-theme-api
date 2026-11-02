@@ -11,6 +11,7 @@
 //   SCHEDULE_SEED … 任意。表示順を作り直したいときだけ数値を変更
 
 import { normalizeMessages } from '../../lib/messages.mjs';
+import { splitPhrases } from '../../lib/phrases.mjs';
 import {
   DEFAULT_SEED,
   isValidDateString,
@@ -76,7 +77,7 @@ export default async function handler(req, _context, { now = new Date() } = {}) 
   const cdnSeconds = Math.min(CDN_CACHE_MAX_SECONDS, secondsUntilJstMidnight(now));
   return json(
     200,
-    { ok: true, date, message: message.text },
+    { ok: true, date, message: message.text, phrases: splitPhrases(message.text) },
     {
       'Cache-Control': 'public, max-age=0, must-revalidate',
       'Netlify-CDN-Cache-Control': `public, s-maxage=${cdnSeconds}`,
