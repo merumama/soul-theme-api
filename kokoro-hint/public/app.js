@@ -33,11 +33,6 @@
     return new Date(Date.now() + 9 * 3600 * 1000).toISOString().slice(0, 10);
   }
 
-  // 前後の「」は画面側で付けるので、シートに入っていたら外す
-  function cleanText(text) {
-    return String(text).trim().replace(/^「([\s\S]*)」$/, '$1').trim();
-  }
-
   function lengthClass(text) {
     var len = text.replace(/\s/g, '').length;
     if (len > 90) return 'is-very-long';
@@ -46,9 +41,9 @@
   }
 
   function render(data) {
-    var text = cleanText(data.message);
+    var text = String(data.message).trim(); // シートの文章をそのまま表示
     els.message.className = 'message ' + lengthClass(text);
-    els.message.textContent = '「' + text + '」';
+    els.message.textContent = text;
     els.date.textContent = formatDate(data.date);
     shownDate = data.date;
     show('message');
