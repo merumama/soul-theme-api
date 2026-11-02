@@ -1,0 +1,213 @@
+:root {
+  --bg: #f7f2ea;          /* アイボリー */
+  --bg-deep: #efe7da;     /* ベージュ */
+  --text: #4a3b30;        /* 落ち着いたブラウン */
+  --text-soft: #8a7766;
+  --accent: #b59a7c;
+  --line: #d8c9b5;
+
+  --font-serif: "Shippori Mincho", "Hiragino Mincho ProN", "Yu Mincho", "YuMincho", serif;
+  --font-sans: "Zen Kaku Gothic New", "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Noto Sans JP", "Yu Gothic", sans-serif;
+  --font-latin: "Cormorant Garamond", "Times New Roman", serif;
+}
+
+*,
+*::before,
+*::after { box-sizing: border-box; }
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  background: var(--bg-deep);
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  min-height: 100dvh;
+  background: var(--bg);
+  background-image: radial-gradient(120% 70% at 50% 0%, #fbf8f3 0%, var(--bg) 55%, var(--bg-deep) 100%);
+  color: var(--text);
+  font-family: var(--font-sans);
+  line-height: 1.8;
+  -webkit-font-smoothing: antialiased;
+}
+
+.page {
+  min-height: 100vh;
+  min-height: 100dvh;
+  max-width: 560px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  padding:
+    calc(clamp(28px, 6vh, 56px) + env(safe-area-inset-top))
+    calc(28px + env(safe-area-inset-right))
+    calc(clamp(20px, 4vh, 32px) + env(safe-area-inset-bottom))
+    calc(28px + env(safe-area-inset-left));
+}
+
+/* ---- ヘッダー ---- */
+.head { text-align: center; }
+
+.brand {
+  margin: 0;
+  font-family: var(--font-latin);
+  font-weight: 500;
+  font-size: 0.8rem;
+  letter-spacing: 0.42em;
+  padding-left: 0.42em; /* letter-spacing の右側の余白を相殺して中央に */
+  color: var(--text-soft);
+}
+
+.title {
+  margin: 0.6em 0 0;
+  font-family: var(--font-serif);
+  font-weight: 500;
+  font-size: 1.15rem;
+  letter-spacing: 0.16em;
+  padding-left: 0.16em;
+}
+
+.date {
+  margin: 0.9em 0 0;
+  min-height: 1.8em;
+  font-size: 0.78rem;
+  letter-spacing: 0.12em;
+  color: var(--text-soft);
+}
+
+/* ---- メッセージ ---- */
+.card {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(28px, 7vh, 72px);
+  padding: clamp(28px, 7vh, 96px) 0;
+  text-align: center;
+}
+
+.rule {
+  display: block;
+  width: 28px;
+  height: 1px;
+  background: var(--accent);
+  opacity: 0.7;
+}
+
+.message {
+  margin: 0;
+  max-width: 100%;
+  font-family: var(--font-serif);
+  font-weight: 500;
+  font-size: clamp(1.15rem, 5.6vw, 1.75rem);
+  line-height: 2;
+  letter-spacing: 0.06em;
+  white-space: pre-line;          /* セル内の改行をそのまま反映 */
+  overflow-wrap: anywhere;
+  text-wrap: pretty;
+  animation: fade 0.8s ease-out both;
+}
+
+/* 文節（.ph）の途中では改行しない。1行に収まらない長い文節だけ、その中で折り返す */
+.message .ph { display: inline-block; max-width: 100%; }
+
+/* 長めのメッセージ：少し小さく、左揃えで読みやすく */
+.message.is-long {
+  font-size: clamp(1.1rem, 4.6vw, 1.4rem);
+  line-height: 2.05;
+  text-align: left;
+}
+.message.is-very-long {
+  font-size: clamp(1rem, 4.2vw, 1.22rem);
+  line-height: 2.05;
+  letter-spacing: 0.04em;
+  text-align: left;
+}
+
+/* ---- 状態表示 ---- */
+.state { color: var(--text-soft); }
+
+.state--error {
+  font-size: 0.92rem;
+  line-height: 2;
+  color: var(--text);
+}
+.state--error p { margin: 0; }
+.error-sub {
+  margin-top: 0.6em !important;
+  font-size: 0.8rem;
+  color: var(--text-soft);
+}
+
+.retry {
+  margin-top: 1.8em;
+  padding: 0.7em 1.8em;
+  font: inherit;
+  font-size: 0.85rem;
+  letter-spacing: 0.08em;
+  color: var(--text);
+  background: transparent;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.retry:hover,
+.retry:focus-visible { background: #fffdf9; border-color: var(--accent); outline: none; }
+
+.dots { display: inline-flex; gap: 8px; }
+.dots i {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--accent);
+  opacity: 0.3;
+  animation: breathe 1.4s ease-in-out infinite;
+}
+.dots i:nth-child(2) { animation-delay: 0.2s; }
+.dots i:nth-child(3) { animation-delay: 0.4s; }
+
+/* ---- フッター ---- */
+.foot {
+  text-align: center;
+  font-size: 0.74rem;
+  letter-spacing: 0.1em;
+  color: var(--text-soft);
+}
+.foot p { margin: 0; }
+
+[hidden] { display: none !important; }
+
+.sr-only {
+  position: absolute;
+  width: 1px; height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+@keyframes fade {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: none; }
+}
+@keyframes breathe {
+  0%, 100% { opacity: 0.25; }
+  50%      { opacity: 0.8; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .message, .dots i { animation: none; }
+  .dots i { opacity: 0.5; }
+}
+
+/* PC：少しゆったり */
+@media (min-width: 768px) {
+  .page { padding-top: 72px; padding-bottom: 48px; }
+  .title { font-size: 1.3rem; }
+  .message { font-size: 1.9rem; }
+  .message.is-long { font-size: 1.5rem; }
+  .message.is-very-long { font-size: 1.3rem; }
+}
