@@ -38,7 +38,8 @@ Supabase 標準のメールは **プロジェクトのメンバー宛てにし�
 - Password：Resend → API Keys で新しく作ったキー（`re_...`、Sending access）
 
 ### 5. メールの文面を日本語にする
-**Authentication → Emails → Templates → Magic link**（「Magic link or OTP」）
+**Authentication → Emails → Templates** の **Confirm sign up** と **Magic link** の2つを、同じ内容にする
+（初めての人には Confirm sign up、2回目からの人には Magic link のメールが届く）
 
 件名：
 ```
