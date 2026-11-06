@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>意識学 用語集</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&display=swap">
+<style>
+  :root{
+    --bg:#faf6f0; --panel:#fffdfa; --ink:#3a332b; --ink-soft:#6b6255;
+    --accent:#8a6d4a; --accent-soft:#c9a876; --line:#e6ddcf; --surface-soft:#fdfaf3;
+    --on-accent:#fffdfa; --mark:#f6e3b8; --danger:#a5483a;
+    --radius:14px; --shadow:0 2px 10px rgba(80,60,30,0.08);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#211c17; --panel:#2b241d; --ink:#ece5d8; --ink-soft:#b3a894;
+      --accent:#d3b184; --accent-soft:#8a6d4a; --line:#443b30; --surface-soft:#332b22;
+      --on-accent:#221a10; --mark:#5a4526; --danger:#e08b7c;
+      --shadow:0 2px 14px rgba(0,0,0,0.35);
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#211c17; --panel:#2b241d; --ink:#ece5d8; --ink-soft:#b3a894;
+    --accent:#d3b184; --accent-soft:#8a6d4a; --line:#443b30; --surface-soft:#332b22;
+    --on-accent:#221a10; --mark:#5a4526; --danger:#e08b7c;
+    --shadow:0 2px 14px rgba(0,0,0,0.35);
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family:"Hiragino Sans","Yu Gothic",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+    line-height:1.8; -webkit-text-size-adjust:100%;
+  }
+  h1,h2{font-family:"Shippori Mincho","Hiragino Mincho ProN","Yu Mincho",serif;}
+  .wrap{max-width:820px; margin:0 auto; padding:24px 16px 80px;}
+  header.top{text-align:center; margin:12px 0 20px;}
+  header.top h1{font-size:1.7rem; margin:0; letter-spacing:.08em; color:var(--accent);}
+  header.top p{margin:4px 0 0; color:var(--ink-soft); font-size:.9rem;}
+
+  /* ロック画面 */
+  #lock{max-width:380px; margin:12vh auto 0; background:var(--panel); border:1px solid var(--line);
+    border-radius:var(--radius); box-shadow:var(--shadow); padding:28px 22px; text-align:center;}
+  #lock h1{margin:0 0 6px; color:var(--accent); font-size:1.5rem; letter-spacing:.08em;}
+  #lock p{margin:0 0 18px; color:var(--ink-soft); font-size:.9rem;}
+  #lock input[type=password]{width:100%; font-size:1rem; padding:12px 14px; border-radius:10px;
+    border:1px solid var(--line); background:var(--surface-soft); color:var(--ink);}
+  #lock label.remember{display:flex; gap:6px; align-items:center; justify-content:center;
+    font-size:.85rem; color:var(--ink-soft); margin:12px 0;}
+  #lock button{width:100%; font-size:1rem; padding:12px; border:0; border-radius:10px;
+    background:var(--accent); color:var(--on-accent); font-weight:700; cursor:pointer;}
+  #lock button:disabled{opacity:.6;}
+  #lockErr{color:var(--danger); font-size:.85rem; min-height:1.4em; margin-top:10px;}
+
+  /* 検索・行タブ */
+  .sticky{position:sticky; top:0; z-index:5; background:var(--bg); padding:10px 0 8px;
+    border-bottom:1px solid var(--line);}
+  .searchbox{position:relative;}
+  .searchbox input{width:100%; font-size:1rem; padding:12px 40px 12px 14px; border-radius:12px;
+    border:1px solid var(--line); background:var(--panel); color:var(--ink); box-shadow:var(--shadow);}
+  .searchbox input:focus{outline:2px solid var(--accent-soft); outline-offset:1px;}
+  .searchbox button{position:absolute; right:6px; top:50%; transform:translateY(-50%);
+    border:0; background:none; color:var(--ink-soft); font-size:1.2rem; padding:6px 8px; cursor:pointer;}
+  .gyou{display:flex; gap:6px; overflow-x:auto; padding:10px 0 2px; scrollbar-width:none;}
+  .gyou::-webkit-scrollbar{display:none;}
+  .gyou button{flex:0 0 auto; min-width:44px; padding:6px 12px; border-radius:999px;
+    border:1px solid var(--line); background:var(--panel); color:var(--ink); font-size:.95rem;
+    cursor:pointer; font-family:inherit;}
+  .gyou button[aria-pressed="true"]{background:var(--accent); color:var(--on-accent); border-color:var(--accent);}
+  .gyou button:disabled{opacity:.35; cursor:default;}
+  .count{font-size:.8rem; color:var(--ink-soft); margin-top:6px;}
+
+  /* 一覧 */
+  h2.gyou-head{font-size:1.15rem; color:var(--accent); margin:26px 0 8px; padding-left:4px;
+    border-left:4px solid var(--accent-soft); padding-left:10px;}
+  details.term{background:var(--panel); border:1px solid var(--line); border-radius:var(--radius);
+    margin:8px 0; box-shadow:var(--shadow);}
+  details.term summary{list-style:none; cursor:pointer; padding:12px 40px 12px 16px; position:relative;}
+  details.term summary::-webkit-details-marker{display:none;}
+  .t-name{font-weight:700; font-size:1.05rem;}
+  .t-yomi{font-size:.78rem; color:var(--ink-soft); margin-left:6px;}
+  .t-short{display:block; color:var(--ink-soft); font-size:.92rem; margin-top:2px;}
+  details.term summary::after{content:"＋"; position:absolute; right:14px; top:12px; color:var(--accent);}
+  details.term[open] summary::after{content:"－";}
+  .t-body{padding:0 16px 14px; border-top:1px dashed var(--line);}
+  .t-body h3{font-size:.8rem; color:var(--accent); margin:12px 0 2px; letter-spacing:.06em;}
+  .t-body p{margin:0;}
+  .t-ex{background:var(--surface-soft); border-radius:10px; padding:8px 12px;}
+  .rel{display:flex; flex-wrap:wrap; gap:6px; margin-top:4px;}
+  .rel button{border:1px solid var(--accent-soft); background:transparent; color:var(--accent);
+    border-radius:999px; padding:2px 10px; font-size:.85rem; cursor:pointer; font-family:inherit;}
+  mark{background:var(--mark); color:inherit; border-radius:3px; padding:0 1px;}
+  .empty{text-align:center; color:var(--ink-soft); padding:40px 0;}
+  .tools{display:flex; justify-content:center; gap:16px; margin-top:30px; font-size:.8rem;}
+  .tools button{background:none; border:0; color:var(--ink-soft); text-decoration:underline; cursor:pointer;}
+  #totop{position:fixed; right:16px; bottom:18px; width:44px; height:44px; border-radius:50%;
+    border:0; background:var(--accent); color:var(--on-accent); font-size:1.1rem; box-shadow:var(--shadow);
+    cursor:pointer; display:none;}
+  .hidden{display:none !important;}
+</style>
+</head>
+<body>
+
+<div id="lock">
+  <h1>意識学 用語集</h1>
+  <p>パスワードを入力してください</p>
+  <form id="lockForm" autocomplete="on">
+    <input type="text" name="username" value="ishikigaku" autocomplete="username" hidden>
+    <input id="pw" type="password" autocomplete="current-password" placeholder="パスワード" required>
+    <label class="remember"><input id="remember" type="checkbox" checked> この端末で記憶する</label>
+    <button id="unlockBtn" type="submit">ひらく</button>
+  </form>
+  <div id="lockErr" role="alert"></div>
+</div>
+
+<div id="app" class="wrap hidden">
+  <header class="top">
+    <h1>意識学 用語集</h1>
+    <p id="total"></p>
+  </header>
+  <div class="sticky">
+    <div class="searchbox">
+      <input id="q" type="text" placeholder="ことば・読み方・意味で検索" aria-label="検索" enterkeyhint="search">
+      <button id="clear" type="button" aria-label="検索をクリア" class="hidden">×</button>
+    </div>
+    <div class="gyou" id="gyou" role="toolbar" aria-label="行で絞り込み"></div>
+    <div class="count" id="count"></div>
+  </div>
+  <main id="list"></main>
+  <div class="tools">
+    <button id="expandAll" type="button">すべて開く</button>
+    <button id="collapseAll" type="button">すべて閉じる</button>
+    <button id="logout" type="button">ログアウト</button>
+  </div>
+</div>
+<button id="totop" type="button" aria-label="上へ戻る">↑</button>
+
+<script>
+// パスワードで暗号化された用語データ（tools/build_glossary.py が生成）
+const PAYLOAD = __PAYLOAD__;
+const STORE_KEY = "ishikigaku-glossary-key";
+
+const GYOU = [
+  ["あ","あいうえお"],["か","かきくけこ"],["さ","さしすせそ"],["た","たちつてと"],
+  ["な","なにぬねの"],["は","はひふへほ"],["ま","まみむめも"],["や","やゆよ"],
+  ["ら","らりるれろ"],["わ","わをん"],
+];
+const SMALL = {"ぁ":"あ","ぃ":"い","ぅ":"う","ぇ":"え","ぉ":"お","っ":"つ","ゃ":"や","ゅ":"ゆ","ょ":"よ","ゎ":"わ"};
+
+function toHira(s){ return s.replace(/[ァ-ヶ]/g, c => String.fromCharCode(c.charCodeAt(0)-0x60)); }
+// 検索用の正規化：全角半角・カナかなを揃え、濁点も無視
+function norm(s){
+  return toHira(String(s||"").normalize("NFKC").toLowerCase())
+    .normalize("NFD").replace(/[゙゚]/g,"").normalize("NFC");
+}
+function gyouOf(yomi){
+  let c = norm(yomi).replace(/^[^ぁ-んa-z0-9]+/,"").charAt(0);
+  c = SMALL[c] || c;
+  for (const [g, chars] of GYOU) if (chars.includes(c)) return g;
+  return "他";
+}
+
+const b64 = s => Uint8Array.from(atob(s), c => c.charCodeAt(0));
+const toB64 = u => btoa(String.fromCharCode(...new Uint8Array(u)));
+
+async function deriveRaw(pw){
+  const base = await crypto.subtle.importKey("raw", new TextEncoder().encode(pw), "PBKDF2", false, ["deriveBits"]);
+  return crypto.subtle.deriveBits({name:"PBKDF2", hash:"SHA-256", salt:b64(PAYLOAD.salt), iterations:PAYLOAD.iter}, base, 256);
+}
+async function decrypt(raw){
+  const key = await crypto.subtle.importKey("raw", raw, "AES-GCM", false, ["decrypt"]);
+  const plain = await crypto.subtle.decrypt({name:"AES-GCM", iv:b64(PAYLOAD.iv)}, key, b64(PAYLOAD.data));
+  return JSON.parse(new TextDecoder().decode(plain));
+}
+function store(get, val){
+  try{
+    if (get) return localStorage.getItem(STORE_KEY) || sessionStorage.getItem(STORE_KEY);
+    if (val === null){ localStorage.removeItem(STORE_KEY); sessionStorage.removeItem(STORE_KEY); return; }
+    (document.getElementById("remember").checked ? localStorage : sessionStorage).setItem(STORE_KEY, val);
+  }catch(e){ return null; }
+}
+
+// ---- ロック解除 ----
+const $ = id => document.getElementById(id);
+$("lockForm").addEventListener("submit", async ev => {
+  ev.preventDefault();
+  $("unlockBtn").disabled = true; $("lockErr").textContent = "";
+  try{
+    const raw = await deriveRaw($("pw").value);
+    const data = await decrypt(raw);
+    store(false, toB64(raw));
+    start(data);
+  }catch(e){
+    $("lockErr").textContent = "パスワードが違います";
+    $("pw").select();
+  }finally{ $("unlockBtn").disabled = false; }
+});
+(async () => {
+  const saved = store(true);
+  if (!saved) return;
+  try{ start(await decrypt(b64(saved))); }catch(e){ store(false, null); }
+})();
+
+// ---- 一覧 ----
+let TERMS = [], activeGyou = "すべて";
+
+function start(data){
+  TERMS = data.map(t => ({...t, g: gyouOf(t.yomi),
+    hay: norm([t.term,t.yomi,t.short,t.detail,t.example,t.related].join(" "))}))
+    .sort((a,b) => a.yomi.localeCompare(b.yomi, "ja"));
+  $("lock").classList.add("hidden");
+  $("app").classList.remove("hidden");
+  $("total").textContent = `全 ${TERMS.length} 語`;
+  buildTabs();
+  render();
+}
+
+function buildTabs(){
+  const present = new Set(TERMS.map(t => t.g));
+  const labels = ["すべて", ...GYOU.map(g => g[0]), ...(present.has("他") ? ["他"] : [])];
+  $("gyou").innerHTML = "";
+  for (const g of labels){
+    const b = document.createElement("button");
+    b.type = "button"; b.textContent = g;
+    b.setAttribute("aria-pressed", g === activeGyou);
+    if (g !== "すべて" && !present.has(g)) b.disabled = true;
+    b.onclick = () => { activeGyou = g; [...$("gyou").children].forEach(x => x.setAttribute("aria-pressed", x === b)); render(); window.scrollTo({top:0}); };
+    $("gyou").appendChild(b);
+  }
+}
+
+const esc = s => String(s||"").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+// 正規化前の文字列に対してハイライト（かな・カナどちらで検索しても光る）
+function hl(text, words){
+  text = String(text||"");
+  if (!words.length) return esc(text);
+  const n = [...text].map(ch => norm(ch));
+  const chars = [...text];
+  const hit = new Array(chars.length).fill(false);
+  const joined = n.join("");
+  // 文字位置 → 正規化後の位置の対応
+  const starts = []; let p = 0; for (const s of n){ starts.push(p); p += s.length; }
+  for (const w of words){
+    let i = joined.indexOf(w);
+    while (i !== -1){
+      for (let k = 0; k < chars.length; k++) if (starts[k] < i + w.length && starts[k] + n[k].length > i) hit[k] = true;
+      i = joined.indexOf(w, i + 1);
+    }
+  }
+  let out = "", open = false;
+  chars.forEach((c, k) => {
+    if (hit[k] && !open){ out += "<mark>"; open = true; }
+    if (!hit[k] && open){ out += "</mark>"; open = false; }
+    out += esc(c);
+  });
+  return out + (open ? "</mark>" : "");
+}
+
+function render(){
+  const raw = $("q").value.trim();
+  $("clear").classList.toggle("hidden", !raw);
+  const words = norm(raw).split(/[\s　]+/).filter(Boolean);
+  const list = TERMS.filter(t =>
+    (activeGyou === "すべて" || t.g === activeGyou) && words.every(w => t.hay.includes(w)));
+  $("count").textContent = (raw || activeGyou !== "すべて") ? `${list.length} 件` : "";
+  const box = $("list"); box.innerHTML = "";
+  if (!list.length){ box.innerHTML = `<p class="empty">見つかりませんでした</p>`; return; }
+  let cur = null, html = "";
+  for (const t of list){
+    if (t.g !== cur){ cur = t.g; html += `<h2 class="gyou-head">${cur === "他" ? "その他" : cur + "行"}</h2>`; }
+    const rel = String(t.related||"").split(/[、,，]/).map(s => s.trim()).filter(Boolean)
+      .map(r => `<button type="button" data-rel="${esc(r)}">${hl(r, words)}</button>`).join("");
+    html += `<details class="term"${words.length ? " open" : ""}>
+      <summary><span class="t-name">${hl(t.term, words)}</span><span class="t-yomi">${hl(t.yomi, words)}</span>
+        <span class="t-short">${hl(t.short, words)}</span></summary>
+      <div class="t-body">
+        ${t.detail ? `<h3>詳しい意味</h3><p>${hl(t.detail, words)}</p>` : ""}
+        ${t.example ? `<h3>具体例</h3><p class="t-ex">${hl(t.example, words)}</p>` : ""}
+        ${rel ? `<h3>関連ワード</h3><div class="rel">${rel}</div>` : ""}
+      </div></details>`;
+  }
+  box.innerHTML = html;
+}
+
+$("q").addEventListener("input", render);
+$("clear").onclick = () => { $("q").value = ""; render(); $("q").focus(); };
+$("list").addEventListener("click", e => {
+  const b = e.target.closest("button[data-rel]"); if (!b) return;
+  $("q").value = b.dataset.rel;
+  activeGyou = "すべて"; [...$("gyou").children].forEach(x => x.setAttribute("aria-pressed", x.textContent === "すべて"));
+  render(); window.scrollTo({top:0, behavior:"smooth"});
+});
+$("expandAll").onclick = () => document.querySelectorAll("details.term").forEach(d => d.open = true);
+$("collapseAll").onclick = () => document.querySelectorAll("details.term").forEach(d => d.open = false);
+$("logout").onclick = () => { store(false, null); location.reload(); };
+window.addEventListener("scroll", () => { $("totop").style.display = scrollY > 600 ? "block" : "none"; }, {passive:true});
+$("totop").onclick = () => window.scrollTo({top:0, behavior:"smooth"});
+</script>
+</body>
+</html>

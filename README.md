@@ -100,3 +100,18 @@ soul_theme_api/
 - 画面：`/journal/`（スマホ対応。クライアントが毎週記入・提出、コーチが閲覧・コメント）
 - データ保存：Supabase。環境変数 `SUPABASE_URL` / `SUPABASE_ANON_KEY` が無い間は端末内だけの「お試しモード」
 - セットアップ手順：`supabase/JOURNAL_SETUP.md`
+
+## 意識学 用語集（`/glossary`）
+Excel の用語集を、スマホでも見やすく・検索できる Web ページにしたもの。
+- 「あ行」「か行」…のタブで絞り込み、ことば・読み方・意味のどれでも検索（カタカナ／ひらがな・濁点の違いは無視）
+- 関連ワードをタップすると、そのことばで検索
+- **合言葉（固定パスワード）を知っている人だけが見られる**。用語データはパスワードで暗号化（AES-256-GCM）して HTML に埋め込んでいるので、公開リポジトリでも中身は読めない
+- 「この端末で記憶する」にチェックすると次回から入力不要
+
+### 用語を追加・修正したとき／パスワードを変えたいとき
+```bash
+pip install openpyxl cryptography
+python tools/build_glossary.py 用語集.xlsx   # パスワードを聞かれる
+git add static/glossary.html && git commit -m "用語集を更新" && git push
+```
+元の Excel はリポジトリに入れないこと（中身が丸見えになるため）。
