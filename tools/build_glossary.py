@@ -1,4 +1,4 @@
-"""意識学 用語集（static/glossary.html と glossary-netlify/index.html）を Excel から生成する。
+"""意識学 用語集（glossary-netlify/index.html）を Excel から生成する。
 
 用語データはパスワードで暗号化（PBKDF2-SHA256 + AES-256-GCM）して HTML に埋め込むので、
 公開リポジトリに置いても中身は読めない。元の Excel はリポジトリに入れないこと。
@@ -25,7 +25,7 @@ from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 
 ROOT = Path(__file__).resolve().parent.parent
 TEMPLATE = ROOT / "tools" / "glossary_template.html"
-OUTPUTS = [ROOT / "static" / "glossary.html", ROOT / "glossary-netlify" / "index.html"]
+OUTPUTS = [ROOT / "glossary-netlify" / "index.html"]
 ITERATIONS = 310_000
 COLUMNS = ["term", "yomi", "short", "detail", "example", "related"]
 

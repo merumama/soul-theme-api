@@ -154,11 +154,6 @@ def palm_reading_tool():
 def finger_dictionary_tool():
     return FileResponse(STATIC_DIR / "finger_dictionary.html")
 
-@app.get("/glossary", include_in_schema=False)
-def glossary():
-    # 意識学 用語集（中身は暗号化済み。tools/build_glossary.py で生成）
-    return FileResponse(STATIC_DIR / "glossary.html")
-
 # 週次ダイエットプラン（static/journal）。Supabase の接続先は app/journal_api.py を参照
 
 @app.get("/journal", include_in_schema=False)
