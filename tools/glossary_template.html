@@ -225,7 +225,7 @@ function buildTabs(){
     b.type = "button"; b.textContent = g;
     b.setAttribute("aria-pressed", g === activeGyou);
     if (g !== "すべて" && !present.has(g)) b.disabled = true;
-    b.onclick = () => { activeGyou = g; [...$("gyou").children].forEach(x => x.setAttribute("aria-pressed", x === b)); render(); window.scrollTo({top:0}); };
+    b.onclick = () => { $("q").value = ""; setGyou(g); render(); window.scrollTo({top:0}); };
     $("gyou").appendChild(b);
   }
 }
@@ -283,12 +283,19 @@ function render(){
   box.innerHTML = html;
 }
 
-$("q").addEventListener("input", render);
+function setGyou(g){
+  activeGyou = g;
+  [...$("gyou").children].forEach(x => x.setAttribute("aria-pressed", x.textContent === g));
+}
+// 検索するときは行タブに関係なく全部から探す
+function onSearch(){ if ($("q").value.trim() && activeGyou !== "すべて") setGyou("すべて"); render(); }
+$("q").addEventListener("input", onSearch);
+$("q").addEventListener("compositionend", onSearch);
 $("clear").onclick = () => { $("q").value = ""; render(); $("q").focus(); };
 $("list").addEventListener("click", e => {
   const b = e.target.closest("button[data-rel]"); if (!b) return;
   $("q").value = b.dataset.rel;
-  activeGyou = "すべて"; [...$("gyou").children].forEach(x => x.setAttribute("aria-pressed", x.textContent === "すべて"));
+  setGyou("すべて");
   render(); window.scrollTo({top:0, behavior:"smooth"});
 });
 $("expandAll").onclick = () => document.querySelectorAll("details.term").forEach(d => d.open = true);
