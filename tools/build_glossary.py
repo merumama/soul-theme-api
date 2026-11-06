@@ -1,4 +1,4 @@
-"""意識学 用語集（static/glossary.html）を Excel から生成する。
+"""意識学 用語集（static/glossary.html と glossary-netlify/index.html）を Excel から生成する。
 
 用語データはパスワードで暗号化（PBKDF2-SHA256 + AES-256-GCM）して HTML に埋め込むので、
 公開リポジトリに置いても中身は読めない。元の Excel はリポジトリに入れないこと。
@@ -25,7 +25,7 @@ from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 
 ROOT = Path(__file__).resolve().parent.parent
 TEMPLATE = ROOT / "tools" / "glossary_template.html"
-OUTPUT = ROOT / "static" / "glossary.html"
+OUTPUTS = [ROOT / "static" / "glossary.html", ROOT / "glossary-netlify" / "index.html"]
 ITERATIONS = 310_000
 COLUMNS = ["term", "yomi", "short", "detail", "example", "related"]
 
@@ -61,8 +61,11 @@ def main() -> None:
     if len(password) < 8:
         sys.exit("パスワードは8文字以上にしてください")
     payload = json.dumps(encrypt(terms, password))
-    OUTPUT.write_text(TEMPLATE.read_text(encoding="utf-8").replace("__PAYLOAD__", payload), encoding="utf-8")
-    print(f"{len(terms)} 語を {OUTPUT.relative_to(ROOT)} に書き出しました")
+    html = TEMPLATE.read_text(encoding="utf-8").replace("__PAYLOAD__", payload)
+    for out in OUTPUTS:
+        out.parent.mkdir(exist_ok=True)
+        out.write_text(html, encoding="utf-8")
+        print(f"{len(terms)} 語を {out.relative_to(ROOT)} に書き出しました")
 
 
 if __name__ == "__main__":
