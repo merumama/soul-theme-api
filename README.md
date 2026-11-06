@@ -101,22 +101,15 @@ soul_theme_api/
 - データ保存：Supabase。環境変数 `SUPABASE_URL` / `SUPABASE_ANON_KEY` が無い間は端末内だけの「お試しモード」
 - セットアップ手順：`supabase/JOURNAL_SETUP.md`
 
-## 意識学 用語集（Netlify で公開）
-Excel の用語集を、スマホでも見やすく・検索できる Web ページにしたもの。
-- 「あ行」「か行」…のタブで絞り込み、ことば・読み方・意味のどれでも検索（カタカナ／ひらがな・濁点の違いは無視）
-- 関連ワードをタップすると、そのことばで検索
-- **合言葉（固定パスワード）を知っている人だけが見られる**。用語データはパスワードで暗号化（AES-256-GCM）して HTML に埋め込んでいるので、公開リポジトリでも中身は読めない
-- 「この端末で記憶する」にチェックすると次回から入力不要
+## 意識学 用語集（Netlify + Supabase）
+Excel の用語集を、スマホでも見やすく・検索できる Web ページにしたもの。意識學の受講生限定。
+- 「あ行」「か行」…のタブで絞り込み、全文検索（カタカナ／ひらがな・濁点の違いは無視）
+- メンバーはメールアドレス＋確認コードで自分で登録 → **管理者が承認した人だけ** が見られる
+- やめた人は承認を外すだけで見られなくなる
+- 用語データは Supabase（用語集専用プロジェクト）にだけ置く。GitHub・Netlify には中身を置かない
 
-### Netlify に置く
-`glossary-netlify/` フォルダの中身は `index.html` だけ。Netlify で「Add new site → Deploy manually」を開き、
-`glossary-netlify` フォルダをそのままドラッグ＆ドロップすれば公開される（無料・待ち時間なし）。
-更新のときは、同じサイトの「Deploys」画面に新しいフォルダをドロップし直す。
-
-### 用語を追加・修正したとき／パスワードを変えたいとき
-```bash
-pip install openpyxl cryptography
-python tools/build_glossary.py 用語集.xlsx   # パスワードを聞かれる（glossary-netlify/index.html を作る）
-git add glossary-netlify && git commit -m "用語集を更新" && git push
-```
-元の Excel はリポジトリに入れないこと（中身が丸見えになるため）。
+ファイル
+- `glossary-netlify/index.html`：ページ本体（Netlify の Deploys にフォルダごとドロップ）
+- `supabase/glossary_setup.sql`：表と権限の設定
+- `tools/glossary_to_sql.py`：Excel → 取り込み用 SQL
+- 設定と運用の手順：[`supabase/GLOSSARY_SETUP.md`](supabase/GLOSSARY_SETUP.md)
