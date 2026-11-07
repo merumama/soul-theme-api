@@ -4,7 +4,7 @@
 -- 何度実行しても壊れないように書いてあります。
 --
 -- しくみ
---   ・だれでもメールアドレスで新規登録できる（名前も入力）
+--   ・だれでもメールアドレスで新規登録できる（名前と期も入力）
 --   ・登録しただけでは見られない。管理者が glossary_members の approved に
 --     チェックを入れた人だけが、用語（glossary_terms）を読める
 --   ・やめた人は approved のチェックを外す（または行を削除）だけで見られなくなる
@@ -18,10 +18,13 @@ create table if not exists public.glossary_members (
   email       text not null,
   name        text not null default '',
   approved    boolean not null default false,
-  memo        text not null default '',          -- 管理者用のメモ（何期の受講生か など）
+  memo        text not null default '',          -- 管理者用のメモ
   created_at  timestamptz not null default now(),
   approved_at timestamptz
 );
+
+-- 期（何期の受講生か）。登録時に本人が入力する
+alter table public.glossary_members add column if not exists ki smallint check (ki between 1 and 999);
 
 -- 用語
 create table if not exists public.glossary_terms (
@@ -45,8 +48,9 @@ as $$
   select exists (select 1 from public.glossary_members where user_id = auth.uid() and approved);
 $$;
 
--- 新規登録（名前の登録・変更）。approved はここでは絶対に変えない
-create or replace function public.glossary_register(p_name text)
+-- 新規登録（名前・期の登録・変更）。approved はここでは絶対に変えない
+drop function if exists public.glossary_register(text);
+create or replace function public.glossary_register(p_name text, p_ki integer default null)
 returns public.glossary_members
 language plpgsql security definer set search_path = public
 as $$
@@ -60,9 +64,12 @@ begin
   if v_name = '' then
     raise exception 'name_required';
   end if;
-  insert into public.glossary_members (user_id, email, name)
-  values (auth.uid(), lower(coalesce(auth.jwt() ->> 'email', '')), v_name)
-  on conflict (user_id) do update set name = excluded.name
+  if p_ki is null or p_ki not between 1 and 999 then
+    raise exception 'ki_required';
+  end if;
+  insert into public.glossary_members (user_id, email, name, ki)
+  values (auth.uid(), lower(coalesce(auth.jwt() ->> 'email', '')), v_name, p_ki)
+  on conflict (user_id) do update set name = excluded.name, ki = excluded.ki
   returning * into v_row;
   return v_row;
 end;
@@ -111,9 +118,9 @@ alter table public.glossary_terms   enable row level security;
 revoke all on public.glossary_members, public.glossary_terms from anon, authenticated;
 grant select on public.glossary_members, public.glossary_terms to authenticated;
 
-revoke all on function public.glossary_register(text) from public, anon;
+revoke all on function public.glossary_register(text, integer) from public, anon;
 revoke all on function public.is_glossary_member() from public, anon;
-grant execute on function public.glossary_register(text) to authenticated;
+grant execute on function public.glossary_register(text, integer) to authenticated;
 grant execute on function public.is_glossary_member() to authenticated;
 
 -- 自分の登録状況だけ見られる

@@ -49,6 +49,9 @@
   #lock button.link{width:auto; background:none; color:var(--ink-soft); text-decoration:underline; font-weight:400; font-size:.85rem; padding:4px;}
   #lock input[type=email], #lock input[type=text]{width:100%; font-size:1rem; padding:12px 14px; border-radius:10px;
     border:1px solid var(--line); background:var(--surface-soft); color:var(--ink); margin-bottom:12px;}
+  #lock label.ki{display:flex; align-items:center; gap:8px; margin-bottom:12px;}
+  #lock label.ki input{margin-bottom:0; flex:0 0 7em; text-align:center;}
+  #lock label.ki span{color:var(--ink); font-weight:700;}
   #lock input[type=password]{width:100%; font-size:1rem; padding:12px 14px; border-radius:10px;
     border:1px solid var(--line); background:var(--surface-soft); color:var(--ink);}
   #lock label.remember{display:flex; gap:6px; align-items:center; justify-content:center;
@@ -126,8 +129,9 @@
   </form>
 
   <form id="stName" class="hidden">
-    <p>はじめての方は、お名前を登録してください。<br>管理者が受講生であることを確認するために使います。</p>
+    <p>はじめての方は、お名前と受講した期を登録してください。<br>管理者が受講生であることを確認するために使います。</p>
     <input id="name" type="text" autocomplete="name" maxlength="60" placeholder="お名前（例：山田 花子）" required>
+    <label class="ki"><input id="ki" type="text" inputmode="numeric" maxlength="3" placeholder="例：13" required><span>期</span></label>
     <button type="submit">登録する</button>
   </form>
 
@@ -205,6 +209,8 @@ function showErr(e){
   if (/rate limit|too many|security purposes|only request this/i.test(m)) t = "短い時間に何度も送信されました。1分ほど待ってからもう一度お試しください。";
   else if (/expired|invalid|token/i.test(m)) t = "確認コードが正しくないか、有効期限が切れています。";
   else if (/email/i.test(m) && /valid|format/i.test(m)) t = "メールアドレスの形を確認してください。";
+  else if (/ki_required/.test(m)) t = "受講した期を数字で入力してください（例：13）";
+  else if (/name_required/.test(m)) t = "お名前を入力してください。";
   else if (/fetch|network/i.test(m)) t = "通信できませんでした。電波のよい所でもう一度お試しください。";
   $("lockErr").textContent = t;
   console.error(e);
@@ -243,7 +249,9 @@ $("stCode").addEventListener("submit", ev => { ev.preventDefault(); busy(ev.targ
 }); });
 $("backEmail").onclick = () => step("stEmail");
 $("stName").addEventListener("submit", ev => { ev.preventDefault(); busy(ev.target, async () => {
-  const { error } = await sb.rpc("glossary_register", { p_name: $("name").value });
+  const ki = parseInt($("ki").value.normalize("NFKC").replace(/\D/g,""), 10);
+  if (!(ki >= 1 && ki <= 999)) { $("lockErr").textContent = "受講した期を数字で入力してください（例：13）"; $("ki").focus(); return; }
+  const { error } = await sb.rpc("glossary_register", { p_name: $("name").value, p_ki: ki });
   if (error) throw error;
   await afterLogin();
 }); });
